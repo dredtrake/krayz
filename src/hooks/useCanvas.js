@@ -24,10 +24,7 @@ let dx = 2;
 let dy = -2;
 const ballRadius = 30;
 const useCanvas = (options = {}) => {
-  const [move, setMove] = useState((p) => ({
-    ...dir,
-    ...(p && { [p]: dir[p] + 1 }),
-  }));
+  const [move, setMove] = useState(dir);
 
   const canvasRef = useRef(null);
 
