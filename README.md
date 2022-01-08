@@ -6,7 +6,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 As a young kid I remember playing this very weird game on my 6128 Amstrad computer, I was maybe 5 to 7 Y/O so I have a hard time to remind the name of it.
 
-If anyone have a clue, I'll be glad to find the original one!
+But then we can also mention qix(xxxxxxxxxxxxxxxxx)
 
 ## What to do ?
 

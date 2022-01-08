@@ -25,7 +25,7 @@ const useCanvas = (options = {}) => {
       // console.log(isKeyDown)
       ctx.beginPath();
       ctx.arc(x, y, radius, 0, Math.PI * 2);
-      ctx.fillStyle = isKeyDown !== "" ? "#CCBBFF99" : "#CFBA3499";
+      ctx.fillStyle = isKeyDown !== "" ? "#9F221099" : "#CFBA3499";
       ctx.fill();
       ctx.closePath();
     },
@@ -62,17 +62,29 @@ const useCanvas = (options = {}) => {
         move.d < height ? move.d : height
       );
       ctx.fill();
-      if (
-        x + dx > width - ballRadius - move.r ||
-        x + dx < ballRadius + move.l
-      ) {
+      if (x + dx > width - ballRadius - move.r) {
         dx = -dx;
+        if (isKeyDown === "l") {
+          console.log("ball is touching moving wall!");
+        }
       }
-      if (
-        y + dy > height - ballRadius - move.d ||
-        y + dy < ballRadius + move.u
-      ) {
+      if (x + dx < ballRadius + move.l) {
+        dx = -dx;
+        if (isKeyDown === "r") {
+          console.log("ball is touching moving wall!");
+        }
+      }
+      if (y + dy < ballRadius + move.u) {
         dy = -dy;
+        if (isKeyDown === "d") {
+          console.log("ball is touching moving wall!");
+        }
+      }
+      if (y + dy > height - ballRadius - move.d) {
+        dy = -dy;
+        if (isKeyDown === "u") {
+          console.log("ball is touching moving wall!");
+        }
       }
 
       x += dx;
