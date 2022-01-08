@@ -6,7 +6,6 @@ export const resizeCanvas = (canvas) => {
     canvas.width = width * ratio;
     canvas.height = height * ratio;
     context.scale(ratio, ratio);
-    console.log(width, height);
     return true; // here you can return some usefull information like delta width and delta height instead of just true
   }
   return false;
