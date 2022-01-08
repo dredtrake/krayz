@@ -9,9 +9,9 @@ const App = () => {
       return (
         <>
           <Canvas />
-          <span>
+          <p>
             {minutes}:{seconds}
-          </span>
+          </p>
         </>
       );
     }
