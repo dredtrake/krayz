@@ -1,4 +1,5 @@
 import Canvas from "./components/Canvas";
+import Countdown from "react-countdown";
 import "./App.css";
 
 const css = {
@@ -12,10 +13,36 @@ const appStyle = {
   ...css,
 };
 
-const App = () => (
-  <div className="App" style={appStyle}>
-    <Canvas style={css} />
-  </div>
-);
+const App = () => {
+  const renderer = ({ hours, minutes, seconds, completed }) => {
+    if (completed) {
+      return <p>Time is over dude!</p>;
+    } else {
+      return (
+        <>
+          <Canvas style={css} />
+          <span>
+            {hours}:{minutes}:{seconds}
+          </span>
+        </>
+      );
+    }
+  };
+  return (
+    <>
+      <div className="App" style={appStyle}>
+        <Countdown
+          date={Date.now() + 30000}
+          renderer={renderer}
+          zeroPadTime="2"
+        />
+      </div>
+      <p style={{ textAlign: "center" }}>
+        Click on the game zone to get the focus, then use arrow keys to reduce
+        the window size
+      </p>
+    </>
+  );
+};
 
 export default App;
