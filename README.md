@@ -17,3 +17,5 @@ So far everything needs to be set. A todo list will soon appear.
 The ball|object bounce on the border of the frame.
 
 With the arrows of the keyboard lock the shape in the requested challenge.
+
+[Check the demo](https://dredtrake.github.io/krayz/)

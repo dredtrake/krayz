@@ -3,14 +3,6 @@ import { resizeCanvas } from "../utils/resizeCanvas";
 
 const [width, height] = [750, 750];
 
-const ball = (ctx, x, y, radius) => {
-  ctx.beginPath();
-  ctx.arc(x, y, radius, 0, Math.PI * 2);
-  ctx.fillStyle = "#CCBBFF99";
-  ctx.fill();
-  ctx.closePath();
-};
-
 const dir = {
   u: 0,
   d: 0,
@@ -25,8 +17,20 @@ let dy = -2;
 const ballRadius = 30;
 const useCanvas = (options = {}) => {
   const [move, setMove] = useState(dir);
-
+  const [isKeyDown, setIsKeyDown] = useState("");
   const canvasRef = useRef(null);
+
+  const ball = useCallback(
+    (ctx, x, y, radius) => {
+      // console.log(isKeyDown)
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fillStyle = isKeyDown !== "" ? "#CCBBFF99" : "#CFBA3499";
+      ctx.fill();
+      ctx.closePath();
+    },
+    [isKeyDown]
+  );
 
   const draw = useCallback(
     (ctx) => {
@@ -74,23 +78,26 @@ const useCanvas = (options = {}) => {
       x += dx;
       y += dy;
     },
-    [move]
+    [move, ball]
   );
 
   const onKeyDown = useCallback((evt) => {
     const { key } = evt;
+    setIsKeyDown("");
     if (key === "ArrowUp") {
       setMove((prevState) => ({ ...prevState, d: prevState.d + 1 }));
+      setIsKeyDown("u");
     } else if (key === "ArrowDown") {
       setMove((prevState) => ({ ...prevState, u: prevState.u + 1 }));
+      setIsKeyDown("d");
     } else if (key === "ArrowLeft") {
       setMove((prevState) => ({ ...prevState, r: prevState.r + 1 }));
+      setIsKeyDown("l");
     } else if (key === "ArrowRight") {
       setMove((prevState) => ({ ...prevState, l: prevState.l + 1 }));
+      setIsKeyDown("r");
     }
   }, []);
-
-  console.log(move);
 
   useEffect(() => {
     const canvas = canvasRef.current;

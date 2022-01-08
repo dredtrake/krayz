@@ -7,7 +7,7 @@ const Canvas = props => {
     <canvas
         onKeyDown={onKeyDown}
         ref={canvasRef}
-        tabIndex="1"
+        tabIndex="0"
         {...rest}
     />
     );

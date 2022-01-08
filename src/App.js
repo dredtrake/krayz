@@ -34,7 +34,7 @@ const App = () => {
         <Countdown
           date={Date.now() + 30000}
           renderer={renderer}
-          zeroPadTime="2"
+          zeroPadTime={2}
         />
       </div>
       <p style={{ textAlign: "center" }}>
