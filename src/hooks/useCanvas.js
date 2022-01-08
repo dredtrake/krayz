@@ -61,7 +61,7 @@ const useCanvas = (options = {}) => {
         move.d < height ? move.d : height
       );
       ctx.fill();
-      if (x + dx > width - ballRadius || x + dx < ballRadius) {
+      if (x + dx > width - ballRadius - move.r || x + dx < ballRadius) {
         dx = -dx;
       }
       if (y + dy > height - ballRadius || y + dy < ballRadius) {
