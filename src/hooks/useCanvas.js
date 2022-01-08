@@ -83,7 +83,6 @@ const useCanvas = (options = {}) => {
 
   const onKeyDown = useCallback((evt) => {
     const { key } = evt;
-    setIsKeyDown("");
     if (key === "ArrowUp") {
       setMove((prevState) => ({ ...prevState, d: prevState.d + 1 }));
       setIsKeyDown("u");
@@ -96,6 +95,19 @@ const useCanvas = (options = {}) => {
     } else if (key === "ArrowRight") {
       setMove((prevState) => ({ ...prevState, l: prevState.l + 1 }));
       setIsKeyDown("r");
+    }
+  }, []);
+
+  const onKeyUp = useCallback((evt) => {
+    const { key } = evt;
+    setIsKeyDown("");
+    if (
+      key === "ArrowUp" ||
+      key === "ArrowDown" ||
+      key === "ArrowLeft" ||
+      key === "ArrowRight"
+    ) {
+      setIsKeyDown("");
     }
   }, []);
 
@@ -118,7 +130,7 @@ const useCanvas = (options = {}) => {
     };
   }, [draw, options]);
 
-  return { canvasRef, onKeyDown };
+  return { canvasRef, onKeyDown, onKeyUp };
 };
 
 export default useCanvas;
