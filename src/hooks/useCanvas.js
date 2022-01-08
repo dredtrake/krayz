@@ -2,36 +2,45 @@ import { useCallback, useRef, useEffect, useState } from "react";
 import { resizeCanvas } from "../utils/resizeCanvas";
 
 const [width, height] = [750, 750];
-const useCanvas = (options = {}) => {
-  const dir = {
-    u: 0,
-    d: 0,
-    l: 0,
-    r: 0,
-  };
 
-  const [move, setMove] = useState((p) => {
-    console.log(p);
-    return {
-      ...dir,
-      ...(p && { [p]: dir[p] + 1 }),
-    };
-  });
+const ball = (ctx, x, y, radius) => {
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
+  ctx.fillStyle = "#CCBBFF99";
+  ctx.fill();
+  ctx.closePath();
+};
+
+const dir = {
+  u: 0,
+  d: 0,
+  l: 0,
+  r: 0,
+};
+
+let x = width / 2;
+let y = height - 30;
+let dx = 2;
+let dy = -2;
+const ballRadius = 30;
+const useCanvas = (options = {}) => {
+  const [move, setMove] = useState((p) => ({
+    ...dir,
+    ...(p && { [p]: dir[p] + 1 }),
+  }));
 
   const canvasRef = useRef(null);
 
   const draw = useCallback(
-    (ctx, frameCount) => {
-      ctx.fillStyle = "#CCBBFF";
+    (ctx) => {
+      ctx.clearRect(0, 0, width, height);
+      ball(ctx, x, y, ballRadius);
       ctx.beginPath();
-      ctx.arc(300, 500, 120, 0, 2 * Math.PI);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.fillStyle = "#FF99CC"; // left
+      ctx.fillStyle = "#FF99CC99"; // left
       ctx.fillRect(0, 0, move.l < width ? move.l : width, height);
       ctx.fill();
       ctx.beginPath();
-      ctx.fillStyle = "#33FFCC"; // right
+      ctx.fillStyle = "#33FFCC99"; // right
       ctx.fillRect(
         width - move.r,
         0,
@@ -40,11 +49,11 @@ const useCanvas = (options = {}) => {
       );
       ctx.fill();
       ctx.beginPath();
-      ctx.fillStyle = "#CCFF99"; // top
+      ctx.fillStyle = "#CCFF9999"; // top
       ctx.fillRect(0, 0, width, move.u < height ? move.u : height);
       ctx.fill();
       ctx.beginPath();
-      ctx.fillStyle = "#CC2299"; // bottom
+      ctx.fillStyle = "#CC229999"; // bottom
       ctx.fillRect(
         0,
         height - move.d,
@@ -52,6 +61,15 @@ const useCanvas = (options = {}) => {
         move.d < height ? move.d : height
       );
       ctx.fill();
+      if (x + dx > width - ballRadius || x + dx < ballRadius) {
+        dx = -dx;
+      }
+      if (y + dy > height - ballRadius || y + dy < ballRadius) {
+        dy = -dy;
+      }
+
+      x += dx;
+      y += dy;
     },
     [move]
   );
@@ -74,22 +92,18 @@ const useCanvas = (options = {}) => {
   useEffect(() => {
     const canvas = canvasRef.current;
     const context = canvas.getContext(options.context || "2d");
-    let frameCount = 0;
     let animationFrameId;
 
     resizeCanvas(canvas);
 
     const render = () => {
-      //   console.log("framecount", frameCount);
-      frameCount++;
-      draw(context, frameCount);
+      draw(context);
       animationFrameId = window.requestAnimationFrame(render);
     };
 
     render();
 
     return () => {
-      console.log("unmount");
       window.cancelAnimationFrame(animationFrameId);
     };
   }, [draw, options]);
