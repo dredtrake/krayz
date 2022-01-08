@@ -10,11 +10,11 @@ const dir = {
   r: 0,
 };
 
+const ballRadius = 10;
 let x = width / 2;
-let y = height - 30;
-let dx = 2;
-let dy = -2;
-const ballRadius = 30;
+let y = height - ballRadius;
+let dx = 3;
+let dy = -3;
 const useCanvas = (options = {}) => {
   const [move, setMove] = useState(dir);
   const [isKeyDown, setIsKeyDown] = useState("");
@@ -62,25 +62,25 @@ const useCanvas = (options = {}) => {
         move.d < height ? move.d : height
       );
       ctx.fill();
-      if (x + dx > width - ballRadius - move.r) {
+      if (x + dx > width - ballRadius / 2 - move.r) {
         dx = -dx;
         if (isKeyDown === "l") {
           console.log("ball is touching moving wall!");
         }
       }
-      if (x + dx < ballRadius + move.l) {
+      if (x + dx < ballRadius / 2 + move.l) {
         dx = -dx;
         if (isKeyDown === "r") {
           console.log("ball is touching moving wall!");
         }
       }
-      if (y + dy < ballRadius + move.u) {
+      if (y + dy < ballRadius / 2 + move.u) {
         dy = -dy;
         if (isKeyDown === "d") {
           console.log("ball is touching moving wall!");
         }
       }
-      if (y + dy > height - ballRadius - move.d) {
+      if (y + dy > height - ballRadius / 2 - move.d) {
         dy = -dy;
         if (isKeyDown === "u") {
           console.log("ball is touching moving wall!");
@@ -90,7 +90,7 @@ const useCanvas = (options = {}) => {
       x += dx;
       y += dy;
     },
-    [move, ball]
+    [move, ball, isKeyDown]
   );
 
   const onKeyDown = useCallback((evt) => {
