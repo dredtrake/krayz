@@ -14,7 +14,7 @@ const appStyle = {
 };
 
 const App = () => {
-  const renderer = ({ hours, minutes, seconds, completed }) => {
+  const renderer = ({ minutes, seconds, completed }) => {
     if (completed) {
       return <p>Time is over dude!</p>;
     } else {
@@ -22,7 +22,7 @@ const App = () => {
         <>
           <Canvas style={css} />
           <span>
-            {hours}:{minutes}:{seconds}
+            {minutes}:{seconds}
           </span>
         </>
       );
