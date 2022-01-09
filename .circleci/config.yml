@@ -1,0 +1,29 @@
+version: 2.1
+orbs:
+  gh-pages: sugarshin/gh-pages@1.0.0
+jobs:
+  test:
+    docker:
+      - image: circleci/node:16.13.0
+    steps:
+      - checkout
+      - run: yarn install --frozen-lockfile
+      - run: yarn test
+  build-deploy:
+    executor: gh-pages/default
+    steps:
+      - checkout
+      - run: ./build.sh
+      - gh-pages/deploy:
+          branch: gh-pages
+          ssh-fingerprints: "43:d9:27:15:91:af:82:04:b2:22:36:d3:4c:30:1c:14"
+workflows:
+  test:
+    jobs:
+      - test
+      - build-deploy:
+          requires:
+            - test
+          filters:
+            branches:
+              only: main
