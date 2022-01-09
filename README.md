@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/dredtrake/krayz/tree/main.svg?style=svg)](https://circleci.com/gh/dredtrake/krayz/tree/main)
+
 # KraYz
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
