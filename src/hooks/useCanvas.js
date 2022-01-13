@@ -1,7 +1,9 @@
 import { useCallback, useRef, useEffect, useState } from "react";
-import { resizeCanvas } from "../utils/resizeCanvas";
+import { resizeCanvas, countSurface } from "../utils/";
 
-const [width, height] = [750, 750];
+const [width, height] = [600, 600];
+
+const initialSurface = width * height;
 
 const dir = {
   u: 0,
@@ -11,18 +13,20 @@ const dir = {
 };
 
 const ballRadius = 10;
-let x = width / 2;
-let y = height - ballRadius;
-let dx = 3;
-let dy = -3;
+let x = Math.floor(Math.random() * width);
+let y = Math.floor(Math.random() * height);
+let dx = 2;
+let dy = -2;
 const useCanvas = (options = {}) => {
+  const [pause, setPause] = useState(false);
   const [move, setMove] = useState(dir);
   const [isKeyDown, setIsKeyDown] = useState("");
+  // value is in %
+  const [surface, setSurface] = useState(100);
   const canvasRef = useRef(null);
 
   const ball = useCallback(
     (ctx, x, y, radius) => {
-      // console.log(isKeyDown)
       ctx.beginPath();
       ctx.arc(x, y, radius, 0, Math.PI * 2);
       ctx.fillStyle = isKeyDown !== "" ? "#9F221099" : "#CFBA3499";
@@ -65,25 +69,25 @@ const useCanvas = (options = {}) => {
       if (x + dx > width - ballRadius / 2 - move.r) {
         dx = -dx;
         if (isKeyDown === "l") {
-          console.log("ball is touching moving wall!");
+          setPause(true);
         }
       }
       if (x + dx < ballRadius / 2 + move.l) {
         dx = -dx;
         if (isKeyDown === "r") {
-          console.log("ball is touching moving wall!");
+          setPause(true);
         }
       }
       if (y + dy < ballRadius / 2 + move.u) {
         dy = -dy;
         if (isKeyDown === "d") {
-          console.log("ball is touching moving wall!");
+          setPause(true);
         }
       }
       if (y + dy > height - ballRadius / 2 - move.d) {
         dy = -dy;
         if (isKeyDown === "u") {
-          console.log("ball is touching moving wall!");
+          setPause(true);
         }
       }
 
@@ -93,22 +97,31 @@ const useCanvas = (options = {}) => {
     [move, ball, isKeyDown]
   );
 
-  const onKeyDown = useCallback((evt) => {
-    const { key } = evt;
-    if (key === "ArrowUp") {
-      setMove((prevState) => ({ ...prevState, d: prevState.d + 1 }));
-      setIsKeyDown("u");
-    } else if (key === "ArrowDown") {
-      setMove((prevState) => ({ ...prevState, u: prevState.u + 1 }));
-      setIsKeyDown("d");
-    } else if (key === "ArrowLeft") {
-      setMove((prevState) => ({ ...prevState, r: prevState.r + 1 }));
-      setIsKeyDown("l");
-    } else if (key === "ArrowRight") {
-      setMove((prevState) => ({ ...prevState, l: prevState.l + 1 }));
-      setIsKeyDown("r");
-    }
-  }, []);
+  const onKeyDown = useCallback(
+    (evt) => {
+      const { key } = evt;
+      if (pause) {
+        return false;
+      }
+      if (key === "ArrowUp") {
+        setMove((prevState) => ({ ...prevState, d: prevState.d + 1 }));
+        setIsKeyDown("u");
+      } else if (key === "ArrowDown") {
+        setMove((prevState) => ({ ...prevState, u: prevState.u + 1 }));
+        setIsKeyDown("d");
+      } else if (key === "ArrowLeft") {
+        setMove((prevState) => ({ ...prevState, r: prevState.r + 1 }));
+        setIsKeyDown("l");
+      } else if (key === "ArrowRight") {
+        setMove((prevState) => ({ ...prevState, l: prevState.l + 1 }));
+        setIsKeyDown("r");
+      }
+      setSurface(() =>
+        Math.floor((countSurface(width, height, move) * 100) / initialSurface)
+      );
+    },
+    [move, pause]
+  );
 
   const onKeyUp = useCallback((evt) => {
     const { key } = evt;
@@ -131,8 +144,10 @@ const useCanvas = (options = {}) => {
     resizeCanvas(canvas);
 
     const render = () => {
-      draw(context);
-      animationFrameId = window.requestAnimationFrame(render);
+      if (!pause) {
+        draw(context);
+        animationFrameId = window.requestAnimationFrame(render);
+      }
     };
 
     render();
@@ -140,9 +155,9 @@ const useCanvas = (options = {}) => {
     return () => {
       window.cancelAnimationFrame(animationFrameId);
     };
-  }, [draw, options]);
+  }, [draw, options, pause]);
 
-  return { canvasRef, onKeyDown, onKeyUp };
+  return { canvasRef, surface, onKeyDown, onKeyUp, pause, setPause };
 };
 
 export default useCanvas;

@@ -2,24 +2,38 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --width: 600px;
+  --height: 600px;
+}
+
 body {
   @apply bg-black;
 }
 
 canvas {
   @apply focus:outline-0;
-  width: 750px;
-  height: 750px;
+  width: var(--width);
+  height: var(--height);
 }
 
 p {
-  text-align: center;
-  color: green;
+  @apply text-center text-green-800;
 }
 
 .app {
-  margin: 2rem auto;
-  border: 2px solid green;
-  width: 754px;
-  height: 754px;
+  @apply relative border-2 border-solid border-green-800 my-8 mx-auto;
+  width: calc(var(--width) + 4px);
+  height: calc(var(--height) + 4px);
+}
+
+.surface {
+  @apply text-4xl absolute right-1 top-1;
+}
+
+.pause {
+  @apply text-green-800 cursor-pointer;
+  &.on {
+    @apply text-green-300;
+  }
 }
