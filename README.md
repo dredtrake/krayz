@@ -1,10 +1,10 @@
-[![CircleCI](https://circleci.com/gh/dredtrake/krayz/tree/main.svg?style=svg)](https://circleci.com/gh/dredtrake/krayz/tree/main)
+[![Build and Deploy](https://github.com/dredtrake/krayz/actions/workflows/deploy.yml/badge.svg)](https://github.com/dredtrake/krayz/actions/workflows/deploy.yml)
 
 # KraYz
 
 A retro-style arcade game inspired by classic games like Qix, built with React and Canvas API.
 
-![KraYz Game Intro Screen](public/intro-screen.png)
+![KraYz Game Intro Screen](./public/intro-screen.png)
 
 ## About
 
