@@ -273,7 +273,10 @@ const useCanvas = (options = {}) => {
 
   useEffect(() => {
     const canvas = canvasRef.current;
+    if (!canvas) return;
+
     const context = canvas.getContext(options.context || '2d');
+    if (!context) return;
 
     resizeCanvas(canvas);
 
@@ -316,7 +319,11 @@ const useCanvas = (options = {}) => {
       !animationRef.current
     ) {
       const canvas = canvasRef.current;
+      if (!canvas) return;
+
       const context = canvas.getContext(options.context || '2d');
+      if (!context) return;
+
       const render = () => {
         draw(context);
         animationRef.current = window.requestAnimationFrame(render);
