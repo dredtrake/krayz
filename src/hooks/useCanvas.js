@@ -14,12 +14,13 @@ const dir = {
 
 const ballRadius = 10;
 const useCanvas = (options = {}) => {
-  const [gameState, setGameState] = useState('start'); // 'start', 'playing', 'paused', 'gameOver', 'gameOverAnimation'
+  const [gameState, setGameState] = useState('start'); // 'start', 'playing', 'paused', 'gameOver', 'gameOverAnimation', 'explosion'
   const [move, setMove] = useState(dir);
   const [isKeyDown, setIsKeyDown] = useState("");
   // value is in %
   const [surface, setSurface] = useState(0);
   const [gameOverStartTime, setGameOverStartTime] = useState(0);
+  const [explosionStartTime, setExplosionStartTime] = useState(0);
   const canvasRef = useRef(null);
   const ballRef = useRef({
     x: Math.floor(Math.random() * width),
@@ -64,12 +65,14 @@ const useCanvas = (options = {}) => {
         move.d < height ? move.d : height
       );
       
-      // Draw ball
-      ctx.beginPath();
-      ctx.arc(ball.x, ball.y, ballRadius, 0, Math.PI * 2);
-      ctx.fillStyle = isKeyDown !== "" ? "#9F221099" : "#CFBA3499";
-      ctx.fill();
-      ctx.closePath();
+      // Draw ball (hide during explosion)
+      if (gameState !== 'explosion') {
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ballRadius, 0, Math.PI * 2);
+        ctx.fillStyle = isKeyDown !== "" ? "#9F221099" : "#CFBA3499";
+        ctx.fill();
+        ctx.closePath();
+      }
       
       // Only update ball if game is playing
       if (gameState === 'playing') {
@@ -77,32 +80,33 @@ const useCanvas = (options = {}) => {
         if (ball.x + ball.dx > width - ballRadius / 2 - move.r) {
           ball.dx = -ball.dx;
           if (isKeyDown === "l") {
-            setGameState('gameOverAnimation');
-            setGameOverStartTime(Date.now());
+            console.log('Ball hit moving wall, starting explosion');
+            setGameState('explosion');
+            setExplosionStartTime(Date.now());
             return;
           }
         }
         if (ball.x + ball.dx < ballRadius / 2 + move.l) {
           ball.dx = -ball.dx;
           if (isKeyDown === "r") {
-            setGameState('gameOverAnimation');
-            setGameOverStartTime(Date.now());
+            setGameState('explosion');
+            setExplosionStartTime(Date.now());
             return;
           }
         }
         if (ball.y + ball.dy < ballRadius / 2 + move.u) {
           ball.dy = -ball.dy;
           if (isKeyDown === "d") {
-            setGameState('gameOverAnimation');
-            setGameOverStartTime(Date.now());
+            setGameState('explosion');
+            setExplosionStartTime(Date.now());
             return;
           }
         }
         if (ball.y + ball.dy > height - ballRadius / 2 - move.d) {
           ball.dy = -ball.dy;
           if (isKeyDown === "u") {
-            setGameState('gameOverAnimation');
-            setGameOverStartTime(Date.now());
+            setGameState('explosion');
+            setExplosionStartTime(Date.now());
             return;
           }
         }
@@ -124,6 +128,86 @@ const useCanvas = (options = {}) => {
         ctx.font = "28px Arial";
         ctx.fillText("Use arrow keys to shrink the walls", width / 2, height / 2 - 20);
         ctx.fillText("Don't let the ball hit a moving wall!", width / 2, height / 2 + 20);
+      } else if (gameState === 'explosion') {
+        const now = Date.now();
+        const elapsed = explosionStartTime > 0 ? now - explosionStartTime : 0;
+        console.log('Explosion state active, elapsed:', elapsed, 'startTime:', explosionStartTime);
+        const explosionDuration = 2500; // Much longer duration
+        
+        if (elapsed >= explosionDuration && explosionStartTime > 0) {
+          console.log('Explosion finished, transitioning to game over');
+          setGameState('gameOverAnimation');
+          setGameOverStartTime(Date.now());
+        }
+        
+        const progress = Math.min(elapsed / explosionDuration, 1);
+        const ball = ballRef.current;
+        
+        // Enhanced explosion particles
+        const particleCount = 25;
+        for (let i = 0; i < particleCount; i++) {
+          const angle = (i / particleCount) * Math.PI * 2 + (elapsed * 0.01);
+          const baseDistance = progress * (80 + i * 3);
+          const wobble = Math.sin(elapsed * 0.02 + i) * 15;
+          const distance = baseDistance + wobble;
+          
+          const x = ball.x + Math.cos(angle) * distance;
+          const y = ball.y + Math.sin(angle) * distance;
+          
+          // More dynamic alpha and size
+          const alpha = (1 - progress) * (0.7 + Math.sin(elapsed * 0.03 + i) * 0.3);
+          const baseSize = 2 + i * 0.3;
+          const pulsing = Math.sin(elapsed * 0.04 + i * 0.5) * 2;
+          const size = Math.max(0.5, baseSize + pulsing * (1 - progress));
+          
+          // Color gradient from bright orange to red
+          const colorProgress = Math.min(progress + i * 0.02, 1);
+          const red = 255;
+          const green = Math.floor(150 * (1 - colorProgress) + 50);
+          const blue = Math.floor(30 * (1 - colorProgress));
+          
+          ctx.fillStyle = `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+          ctx.beginPath();
+          ctx.arc(x, y, size, 0, Math.PI * 2);
+          ctx.fill();
+          
+          // Add particle trails
+          if (progress > 0.3) {
+            const trailX = ball.x + Math.cos(angle) * distance * 0.7;
+            const trailY = ball.y + Math.sin(angle) * distance * 0.7;
+            ctx.fillStyle = `rgba(${red}, ${green + 50}, ${blue + 20}, ${alpha * 0.4})`;
+            ctx.beginPath();
+            ctx.arc(trailX, trailY, size * 0.6, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          
+          // Add sparks for some particles
+          if (i % 3 === 0 && progress < 0.8) {
+            const sparkX = x + (Math.random() - 0.5) * 10;
+            const sparkY = y + (Math.random() - 0.5) * 10;
+            ctx.fillStyle = `rgba(255, 255, 200, ${alpha * 0.8})`;
+            ctx.fillRect(sparkX, sparkY, 2, 2);
+          }
+        }
+        
+        // Enhanced flash effect
+        if (progress < 0.2) {
+          const flashAlpha = 0.6 * (1 - progress / 0.2);
+          ctx.fillStyle = `rgba(255, 255, 255, ${flashAlpha})`;
+          ctx.fillRect(0, 0, width, height);
+        }
+        
+        // Add shockwave ring
+        if (progress < 0.5) {
+          const ringRadius = progress * 120;
+          const ringAlpha = (1 - progress / 0.5) * 0.4;
+          ctx.strokeStyle = `rgba(255, 150, 0, ${ringAlpha})`;
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.arc(ball.x, ball.y, ringRadius, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        
       } else if (gameState === 'gameOverAnimation' || gameState === 'gameOver') {
         const now = Date.now();
         const elapsed = now - gameOverStartTime;
@@ -264,7 +348,7 @@ const useCanvas = (options = {}) => {
         }
       }
     },
-    [move, isKeyDown, gameState, surface, gameOverStartTime]
+    [move, isKeyDown, gameState, surface, gameOverStartTime, explosionStartTime]
   );
 
   const startGame = useCallback(() => {
@@ -272,7 +356,8 @@ const useCanvas = (options = {}) => {
     setMove(dir);
     setSurface(0);
     setIsKeyDown("");
-    setGameOverStartTime(0); // Reset game over timer
+    setGameOverStartTime(0);
+    setExplosionStartTime(0);
     ballRef.current = {
       x: Math.floor(Math.random() * width),
       y: Math.floor(Math.random() * height),
@@ -341,7 +426,7 @@ const useCanvas = (options = {}) => {
       animationRef.current = window.requestAnimationFrame(render);
     };
 
-    if (gameState === 'playing' || gameState === 'gameOverAnimation') {
+    if (gameState === 'playing' || gameState === 'gameOverAnimation' || gameState === 'explosion') {
       render();
     }
 
@@ -353,10 +438,10 @@ const useCanvas = (options = {}) => {
   }, [draw, options, gameState]);
 
   useEffect(() => {
-    if (gameState !== 'playing' && gameState !== 'gameOverAnimation' && animationRef.current) {
+    if (gameState !== 'playing' && gameState !== 'gameOverAnimation' && gameState !== 'explosion' && animationRef.current) {
       window.cancelAnimationFrame(animationRef.current);
       animationRef.current = null;
-    } else if ((gameState === 'playing' || gameState === 'gameOverAnimation') && !animationRef.current) {
+    } else if ((gameState === 'playing' || gameState === 'gameOverAnimation' || gameState === 'explosion') && !animationRef.current) {
       const canvas = canvasRef.current;
       const context = canvas.getContext(options.context || "2d");
       const render = () => {
