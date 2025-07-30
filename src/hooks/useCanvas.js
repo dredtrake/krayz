@@ -5,7 +5,6 @@ import { drawWalls, drawBall, updateBallPhysics } from '../renderers/gameRendere
 import { drawStartScreen } from '../renderers/startScreenRenderer';
 import { drawExplosion } from '../renderers/explosionRenderer';
 import { drawGameOverScreen } from '../renderers/gameOverRenderer';
-import { drawGameStats } from '../renderers/gameStatsRenderer';
 
 const [width, height] = [600, 600];
 
@@ -77,8 +76,7 @@ const useCanvas = (options = {}) => {
           setGameScore
         );
 
-        // Draw unified game stats overlay
-        drawGameStats(ctx, width, height, surface, timeLeft, displayedScore);
+        // Stats are now displayed as HTML elements outside the canvas
       }
 
       // Game state overlays
@@ -333,7 +331,17 @@ const useCanvas = (options = {}) => {
     }
   }, [gameState, draw, options]);
 
-  return { canvasRef, surface, onKeyDown, onKeyUp, gameState, startGame, pauseGame };
+  return {
+    canvasRef,
+    surface,
+    onKeyDown,
+    onKeyUp,
+    gameState,
+    startGame,
+    pauseGame,
+    timeLeft,
+    displayedScore,
+  };
 };
 
 export default useCanvas;

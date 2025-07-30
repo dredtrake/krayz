@@ -32,8 +32,71 @@ p {
 }
 
 .pause {
-  @apply text-green-800 cursor-pointer;
-  &.on {
-    @apply text-green-300;
+  @apply text-green-400 cursor-pointer fixed bottom-8 right-8 text-xl font-bold;
+  @apply bg-black bg-opacity-90 border-2 border-green-400 rounded-lg px-6 py-2;
+  @apply transition-all duration-200 hover:bg-green-400 hover:text-black;
+  font-family: monospace;
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 255, 136, 0.4);
+  }
+}
+
+/* Game Stats Box */
+.game-stats-box {
+  @apply fixed top-8 right-8;
+  @apply bg-black bg-opacity-90 border-2 border-solid rounded-lg;
+  @apply px-6 py-4 min-w-[220px];
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.85) 100%);
+  border-color: #00ff88;
+  box-shadow: 0 4px 20px rgba(0, 255, 136, 0.3);
+}
+
+.game-stats-title {
+  @apply text-white text-center font-bold text-sm mb-3 tracking-wider;
+  font-family: monospace;
+}
+
+.game-stats-content {
+  @apply space-y-2;
+}
+
+.stat-row {
+  @apply flex justify-between items-center;
+  font-family: monospace;
+}
+
+.stat-label {
+  @apply text-white text-sm;
+}
+
+.stat-value {
+  @apply font-bold text-base;
+}
+
+.stat-value.coverage {
+  @apply text-green-400;
+}
+
+.stat-value.timer {
+  @apply text-cyan-400;
+  transition: color 0.3s ease;
+}
+
+.stat-value.timer.timer-low {
+  @apply text-red-500;
+  animation: pulse 1s infinite;
+}
+
+.stat-value.score {
+  @apply text-yellow-400 text-lg;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
   }
 }

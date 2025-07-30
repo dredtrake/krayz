@@ -1,9 +1,32 @@
 import React from 'react';
 
-const GameUI = ({ gameState, surface, pauseGame, startGame }) => {
+const GameUI = ({ gameState, surface, pauseGame, startGame, timeLeft, displayedScore }) => {
   return (
     <>
-      {/* Game Info */}
+      {/* Game Stats Box */}
+      {(gameState === 'playing' || gameState === 'paused') && (
+        <div className="game-stats-box">
+          <div className="game-stats-title">GAME STATS</div>
+          <div className="game-stats-content">
+            <div className="stat-row">
+              <span className="stat-label">Coverage:</span>
+              <span className="stat-value coverage">{surface}%</span>
+            </div>
+            <div className="stat-row">
+              <span className="stat-label">Time:</span>
+              <span className={`stat-value timer ${timeLeft <= 10 ? 'timer-low' : ''}`}>
+                {timeLeft}s
+              </span>
+            </div>
+            <div className="stat-row">
+              <span className="stat-label score-label">Score:</span>
+              <span className="stat-value score">{Math.round(displayedScore)}</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Pause/Resume Button */}
       {gameState === 'playing' && (
         <div className="pause" onClick={pauseGame}>
           Pause
