@@ -8,7 +8,7 @@
 }
 
 body {
-  @apply bg-black;
+  @apply bg-black flex items-center justify-center min-h-screen;
 }
 
 canvas {
@@ -22,7 +22,7 @@ p {
 }
 
 .app {
-  @apply relative border-2 border-solid border-green-800 my-8 mx-auto;
+  @apply relative border-2 border-solid border-green-800;
   width: calc(var(--width) + 4px);
   height: calc(var(--height) + 4px);
 }
