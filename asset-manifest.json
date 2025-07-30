@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/krayz/static/css/main.4ea1f785.css",
-    "main.js": "/krayz/static/js/main.03638126.js",
-    "static/js/787.415d3a28.chunk.js": "/krayz/static/js/787.415d3a28.chunk.js",
+    "main.css": "/krayz/static/css/main.779891df.css",
+    "main.js": "/krayz/static/js/main.36ddcbea.js",
+    "static/js/453.caeaf526.chunk.js": "/krayz/static/js/453.caeaf526.chunk.js",
     "index.html": "/krayz/index.html",
-    "main.4ea1f785.css.map": "/krayz/static/css/main.4ea1f785.css.map",
-    "main.03638126.js.map": "/krayz/static/js/main.03638126.js.map",
-    "787.415d3a28.chunk.js.map": "/krayz/static/js/787.415d3a28.chunk.js.map"
+    "main.779891df.css.map": "/krayz/static/css/main.779891df.css.map",
+    "main.36ddcbea.js.map": "/krayz/static/js/main.36ddcbea.js.map",
+    "453.caeaf526.chunk.js.map": "/krayz/static/js/453.caeaf526.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.4ea1f785.css",
-    "static/js/main.03638126.js"
+    "static/css/main.779891df.css",
+    "static/js/main.36ddcbea.js"
   ]
 }
