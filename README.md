@@ -4,7 +4,7 @@
 
 A retro-style arcade game inspired by classic games like Qix, built with React and Canvas API.
 
-![KraYz Game Intro Screen](./public/intro-screen.png)
+![KraYz Game Intro Screen](./public/intro-screen.png?v=2)
 
 ## About
 
