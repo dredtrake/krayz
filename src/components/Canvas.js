@@ -39,9 +39,9 @@ const Canvas = (props) => {
       {(gameState === 'start' || gameState === 'gameOver') && (
         <div className="game-button" onClick={startGame} style={{
           position: 'absolute',
-          top: '50%',
+          bottom: '50px',
           left: '50%',
-          transform: 'translate(-50%, -50%)',
+          transform: 'translateX(-50%)',
           background: gameState === 'start' ? '#FFD700' : '#FF4444',
           color: gameState === 'start' ? '#000' : '#FFF',
           padding: '15px 30px',
@@ -56,6 +56,7 @@ const Canvas = (props) => {
           {gameState === 'start' ? 'START' : 'RESTART'}
         </div>
       )}
+      
     </>
   );
 };

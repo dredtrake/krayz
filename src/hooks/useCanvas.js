@@ -14,11 +14,12 @@ const dir = {
 
 const ballRadius = 10;
 const useCanvas = (options = {}) => {
-  const [gameState, setGameState] = useState('start'); // 'start', 'playing', 'paused', 'gameOver'
+  const [gameState, setGameState] = useState('start'); // 'start', 'playing', 'paused', 'gameOver', 'gameOverAnimation'
   const [move, setMove] = useState(dir);
   const [isKeyDown, setIsKeyDown] = useState("");
   // value is in %
   const [surface, setSurface] = useState(100);
+  const [gameOverStartTime, setGameOverStartTime] = useState(0);
   const canvasRef = useRef(null);
   const ballRef = useRef({
     x: Math.floor(Math.random() * width),
@@ -74,28 +75,32 @@ const useCanvas = (options = {}) => {
         if (ball.x + ball.dx > width - ballRadius / 2 - move.r) {
           ball.dx = -ball.dx;
           if (isKeyDown === "l") {
-            setGameState('gameOver');
+            setGameState('gameOverAnimation');
+            setGameOverStartTime(Date.now());
             return;
           }
         }
         if (ball.x + ball.dx < ballRadius / 2 + move.l) {
           ball.dx = -ball.dx;
           if (isKeyDown === "r") {
-            setGameState('gameOver');
+            setGameState('gameOverAnimation');
+            setGameOverStartTime(Date.now());
             return;
           }
         }
         if (ball.y + ball.dy < ballRadius / 2 + move.u) {
           ball.dy = -ball.dy;
           if (isKeyDown === "d") {
-            setGameState('gameOver');
+            setGameState('gameOverAnimation');
+            setGameOverStartTime(Date.now());
             return;
           }
         }
         if (ball.y + ball.dy > height - ballRadius / 2 - move.d) {
           ball.dy = -ball.dy;
           if (isKeyDown === "u") {
-            setGameState('gameOver');
+            setGameState('gameOverAnimation');
+            setGameOverStartTime(Date.now());
             return;
           }
         }
@@ -117,36 +122,115 @@ const useCanvas = (options = {}) => {
         ctx.font = "28px Arial";
         ctx.fillText("Use arrow keys to shrink the walls", width / 2, height / 2 - 20);
         ctx.fillText("Don't let the ball hit a moving wall!", width / 2, height / 2 + 20);
+      } else if (gameState === 'gameOverAnimation' || gameState === 'gameOver') {
+        const now = Date.now();
+        const elapsed = now - gameOverStartTime;
+        const animationDuration = 3000; // 3 seconds
         
-        ctx.font = "bold 32px Arial";
-        ctx.fillStyle = "#FFD700";
-        ctx.fillText("Click START to begin", width / 2, height / 2 + 80);
-      } else if (gameState === 'gameOver') {
-        ctx.fillStyle = "rgba(150, 0, 0, 0.95)";
+        if (gameState === 'gameOverAnimation' && elapsed >= animationDuration) {
+          setGameState('gameOver');
+        }
+        
+        // Animated background effect
+        const progress = Math.min(elapsed / animationDuration, 1);
+        const pulseIntensity = Math.sin(now * 0.015) * 0.3 + 0.7;
+        
+        // Gradient background animation
+        const gradient = ctx.createRadialGradient(
+          width / 2, height / 2, 0,
+          width / 2, height / 2, Math.max(width, height)
+        );
+        gradient.addColorStop(0, `rgba(220, 20, 60, ${0.3 + progress * 0.6})`);
+        gradient.addColorStop(0.5, `rgba(139, 0, 0, ${0.4 + progress * 0.5})`);
+        gradient.addColorStop(1, `rgba(0, 0, 0, ${0.8 + progress * 0.2})`);
+        
+        ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, width, height);
         
-        // Flashing effect for game over
-        const flashAlpha = Math.sin(Date.now() * 0.01) * 0.3 + 0.7;
-        ctx.fillStyle = `rgba(255, 255, 255, ${flashAlpha})`;
+        // Animated particles/sparks effect
+        for (let i = 0; i < 20; i++) {
+          const angle = (i / 20) * Math.PI * 2 + now * 0.005;
+          const distance = 50 + Math.sin(now * 0.01 + i) * 30;
+          const x = width / 2 + Math.cos(angle) * distance * progress;
+          const y = height / 2 + Math.sin(angle) * distance * progress;
+          
+          ctx.fillStyle = `rgba(255, 255, 255, ${0.8 * pulseIntensity})`;
+          ctx.beginPath();
+          ctx.arc(x, y, 2 + Math.sin(now * 0.02 + i) * 1, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        
+        // Main "GAME OVER" text with scale animation
+        const textScale = gameState === 'gameOverAnimation' ? 
+          Math.min(1, (elapsed / 1000) * 2) : 1; // Scale up over first second
+        
+        ctx.save();
+        ctx.translate(width / 2, height / 2 - 60);
+        ctx.scale(textScale, textScale);
+        
+        // Text shadow effect
+        ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
         ctx.font = "bold 64px Arial";
         ctx.textAlign = "center";
-        ctx.fillText("GAME OVER", width / 2, height / 2 - 60);
+        ctx.fillText("GAME OVER", 3, 3);
         
-        ctx.fillStyle = "white";
-        ctx.font = "32px Arial";
-        ctx.fillText(`Final Score: ${surface}%`, width / 2, height / 2);
+        // Main text with pulsing effect
+        const textAlpha = Math.sin(now * 0.01) * 0.3 + 0.7;
+        ctx.fillStyle = `rgba(255, 255, 255, ${textAlpha})`;
+        ctx.fillText("GAME OVER", 0, 0);
         
-        ctx.font = "bold 28px Arial";
-        ctx.fillStyle = "#FFD700";
-        ctx.fillText("Click RESTART to play again", width / 2, height / 2 + 60);
+        ctx.restore();
         
-        // Add border effect
-        ctx.strokeStyle = "#FF0000";
-        ctx.lineWidth = 8;
+        // Score with fade-in effect
+        if (elapsed > 1000) {
+          const scoreAlpha = Math.min(1, (elapsed - 1000) / 1000);
+          ctx.fillStyle = `rgba(255, 215, 0, ${scoreAlpha})`;
+          ctx.font = "bold 36px Arial";
+          ctx.textAlign = "center";
+          ctx.fillText(`Final Score: ${surface}%`, width / 2, height / 2 + 20);
+        }
+        
+        
+        // Animated border effect
+        ctx.strokeStyle = `rgba(255, 0, 0, ${pulseIntensity})`;
+        ctx.lineWidth = 6 + Math.sin(now * 0.02) * 2;
         ctx.strokeRect(10, 10, width - 20, height - 20);
+        
+        // Corner decorations
+        const cornerSize = 30;
+        ctx.strokeStyle = `rgba(255, 215, 0, ${pulseIntensity})`;
+        ctx.lineWidth = 4;
+        
+        // Top-left corner
+        ctx.beginPath();
+        ctx.moveTo(10, 10 + cornerSize);
+        ctx.lineTo(10, 10);
+        ctx.lineTo(10 + cornerSize, 10);
+        ctx.stroke();
+        
+        // Top-right corner
+        ctx.beginPath();
+        ctx.moveTo(width - 10 - cornerSize, 10);
+        ctx.lineTo(width - 10, 10);
+        ctx.lineTo(width - 10, 10 + cornerSize);
+        ctx.stroke();
+        
+        // Bottom-left corner
+        ctx.beginPath();
+        ctx.moveTo(10, height - 10 - cornerSize);
+        ctx.lineTo(10, height - 10);
+        ctx.lineTo(10 + cornerSize, height - 10);
+        ctx.stroke();
+        
+        // Bottom-right corner
+        ctx.beginPath();
+        ctx.moveTo(width - 10 - cornerSize, height - 10);
+        ctx.lineTo(width - 10, height - 10);
+        ctx.lineTo(width - 10, height - 10 - cornerSize);
+        ctx.stroke();
       }
     },
-    [move, isKeyDown, gameState, surface]
+    [move, isKeyDown, gameState, surface, gameOverStartTime]
   );
 
   const startGame = useCallback(() => {
@@ -222,7 +306,7 @@ const useCanvas = (options = {}) => {
       animationRef.current = window.requestAnimationFrame(render);
     };
 
-    if (gameState === 'playing') {
+    if (gameState === 'playing' || gameState === 'gameOverAnimation') {
       render();
     }
 
@@ -234,10 +318,10 @@ const useCanvas = (options = {}) => {
   }, [draw, options, gameState]);
 
   useEffect(() => {
-    if (gameState !== 'playing' && animationRef.current) {
+    if (gameState !== 'playing' && gameState !== 'gameOverAnimation' && animationRef.current) {
       window.cancelAnimationFrame(animationRef.current);
       animationRef.current = null;
-    } else if (gameState === 'playing' && !animationRef.current) {
+    } else if ((gameState === 'playing' || gameState === 'gameOverAnimation') && !animationRef.current) {
       const canvas = canvasRef.current;
       const context = canvas.getContext(options.context || "2d");
       const render = () => {
