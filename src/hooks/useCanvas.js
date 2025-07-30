@@ -131,103 +131,135 @@ const useCanvas = (options = {}) => {
           setGameState('gameOver');
         }
         
-        // Animated background effect
         const progress = Math.min(elapsed / animationDuration, 1);
-        const pulseIntensity = Math.sin(now * 0.015) * 0.3 + 0.7;
         
-        // Gradient background animation
-        const gradient = ctx.createRadialGradient(
-          width / 2, height / 2, 0,
-          width / 2, height / 2, Math.max(width, height)
-        );
-        gradient.addColorStop(0, `rgba(220, 20, 60, ${0.3 + progress * 0.6})`);
-        gradient.addColorStop(0.5, `rgba(139, 0, 0, ${0.4 + progress * 0.5})`);
-        gradient.addColorStop(1, `rgba(0, 0, 0, ${0.8 + progress * 0.2})`);
-        
-        ctx.fillStyle = gradient;
+        // Retro CRT-style background with scanlines
+        ctx.fillStyle = "#000";
         ctx.fillRect(0, 0, width, height);
         
-        // Animated particles/sparks effect
-        for (let i = 0; i < 20; i++) {
-          const angle = (i / 20) * Math.PI * 2 + now * 0.005;
-          const distance = 50 + Math.sin(now * 0.01 + i) * 30;
-          const x = width / 2 + Math.cos(angle) * distance * progress;
-          const y = height / 2 + Math.sin(angle) * distance * progress;
-          
-          ctx.fillStyle = `rgba(255, 255, 255, ${0.8 * pulseIntensity})`;
-          ctx.beginPath();
-          ctx.arc(x, y, 2 + Math.sin(now * 0.02 + i) * 1, 0, Math.PI * 2);
-          ctx.fill();
+        // Add retro green tint overlay
+        ctx.fillStyle = `rgba(0, 255, 0, ${0.05 + progress * 0.1})`;
+        ctx.fillRect(0, 0, width, height);
+        
+        // Scanlines effect
+        for (let y = 0; y < height; y += 4) {
+          ctx.fillStyle = `rgba(0, 255, 0, ${0.1 + Math.sin(now * 0.01 + y * 0.1) * 0.05})`;
+          ctx.fillRect(0, y, width, 2);
         }
         
-        // Main "GAME OVER" text with scale animation
+        // Glitch effect squares (random pixels)
+        if (Math.random() < 0.3) {
+          for (let i = 0; i < 15; i++) {
+            const x = Math.random() * width;
+            const y = Math.random() * height;
+            const size = Math.random() * 8 + 2;
+            ctx.fillStyle = `rgba(${Math.random() * 100}, 255, ${Math.random() * 100}, 0.6)`;
+            ctx.fillRect(x, y, size, size);
+          }
+        }
+        
+        // Retro pixel-style "GAME OVER" text
         const textScale = gameState === 'gameOverAnimation' ? 
-          Math.min(1, (elapsed / 1000) * 2) : 1; // Scale up over first second
+          Math.min(1, (elapsed / 800) * 1.2) : 1; // Faster, bouncier scale
         
         ctx.save();
         ctx.translate(width / 2, height / 2 - 60);
         ctx.scale(textScale, textScale);
         
-        // Text shadow effect
-        ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
-        ctx.font = "bold 64px Arial";
-        ctx.textAlign = "center";
-        ctx.fillText("GAME OVER", 3, 3);
+        // Create pixel-perfect text effect
+        const pixelSize = 8;
+        const textFlicker = Math.sin(now * 0.02) > 0.1 ? 1 : 0.7; // Random flicker
         
-        // Main text with pulsing effect
-        const textAlpha = Math.sin(now * 0.01) * 0.3 + 0.7;
-        ctx.fillStyle = `rgba(255, 255, 255, ${textAlpha})`;
+        // Shadow/depth effect in retro green
+        ctx.fillStyle = `rgba(0, 150, 0, ${textFlicker * 0.8})`;
+        ctx.font = "bold 72px monospace";
+        ctx.textAlign = "center";
+        ctx.fillText("GAME OVER", 4, 4);
+        
+        // Main text in bright retro green
+        ctx.fillStyle = `rgba(0, 255, 0, ${textFlicker})`;
         ctx.fillText("GAME OVER", 0, 0);
+        
+        // Add retro outline effect
+        ctx.strokeStyle = `rgba(255, 255, 255, ${textFlicker * 0.6})`;
+        ctx.lineWidth = 2;
+        ctx.strokeText("GAME OVER", 0, 0);
         
         ctx.restore();
         
-        // Score with fade-in effect
+        // Retro score display with typewriter effect
         if (elapsed > 1000) {
-          const scoreAlpha = Math.min(1, (elapsed - 1000) / 1000);
-          ctx.fillStyle = `rgba(255, 215, 0, ${scoreAlpha})`;
-          ctx.font = "bold 36px Arial";
+          const scoreProgress = Math.min(1, (elapsed - 1000) / 1000);
+          const scoreText = `FINAL SCORE: ${surface}%`;
+          const visibleChars = Math.floor(scoreText.length * scoreProgress);
+          const displayText = scoreText.substring(0, visibleChars);
+          
+          ctx.fillStyle = `rgba(255, 255, 0, ${scoreProgress})`;
+          ctx.font = "bold 28px monospace";
           ctx.textAlign = "center";
-          ctx.fillText(`Final Score: ${surface}%`, width / 2, height / 2 + 20);
+          ctx.fillText(displayText, width / 2, height / 2 + 30);
+          
+          // Blinking cursor
+          if (visibleChars < scoreText.length && Math.sin(now * 0.02) > 0) {
+            ctx.fillText("_", width / 2 + ctx.measureText(displayText).width / 2 + 10, height / 2 + 30);
+          }
         }
         
+        // Retro border with classic arcade style
+        const borderFlicker = Math.sin(now * 0.025) * 0.3 + 0.7;
         
-        // Animated border effect
-        ctx.strokeStyle = `rgba(255, 0, 0, ${pulseIntensity})`;
-        ctx.lineWidth = 6 + Math.sin(now * 0.02) * 2;
-        ctx.strokeRect(10, 10, width - 20, height - 20);
-        
-        // Corner decorations
-        const cornerSize = 30;
-        ctx.strokeStyle = `rgba(255, 215, 0, ${pulseIntensity})`;
+        // Outer border in cyan
+        ctx.strokeStyle = `rgba(0, 255, 255, ${borderFlicker})`;
         ctx.lineWidth = 4;
+        ctx.strokeRect(20, 20, width - 40, height - 40);
         
-        // Top-left corner
-        ctx.beginPath();
-        ctx.moveTo(10, 10 + cornerSize);
-        ctx.lineTo(10, 10);
-        ctx.lineTo(10 + cornerSize, 10);
-        ctx.stroke();
+        // Inner border in magenta
+        ctx.strokeStyle = `rgba(255, 0, 255, ${borderFlicker * 0.8})`;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(30, 30, width - 60, height - 60);
         
-        // Top-right corner
-        ctx.beginPath();
-        ctx.moveTo(width - 10 - cornerSize, 10);
-        ctx.lineTo(width - 10, 10);
-        ctx.lineTo(width - 10, 10 + cornerSize);
-        ctx.stroke();
+        // Classic arcade corner brackets
+        const bracketSize = 25;
+        ctx.strokeStyle = `rgba(255, 255, 0, ${borderFlicker})`;
+        ctx.lineWidth = 3;
         
-        // Bottom-left corner
-        ctx.beginPath();
-        ctx.moveTo(10, height - 10 - cornerSize);
-        ctx.lineTo(10, height - 10);
-        ctx.lineTo(10 + cornerSize, height - 10);
-        ctx.stroke();
+        // Corner brackets (classic arcade style)
+        const corners = [
+          [30, 30], [width - 30, 30], 
+          [30, height - 30], [width - 30, height - 30]
+        ];
         
-        // Bottom-right corner
-        ctx.beginPath();
-        ctx.moveTo(width - 10 - cornerSize, height - 10);
-        ctx.lineTo(width - 10, height - 10);
-        ctx.lineTo(width - 10, height - 10 - cornerSize);
-        ctx.stroke();
+        corners.forEach(([x, y], i) => {
+          ctx.beginPath();
+          if (i === 0) { // Top-left
+            ctx.moveTo(x, y + bracketSize);
+            ctx.lineTo(x, y);
+            ctx.lineTo(x + bracketSize, y);
+          } else if (i === 1) { // Top-right
+            ctx.moveTo(x - bracketSize, y);
+            ctx.lineTo(x, y);
+            ctx.lineTo(x, y + bracketSize);
+          } else if (i === 2) { // Bottom-left
+            ctx.moveTo(x, y - bracketSize);
+            ctx.lineTo(x, y);
+            ctx.lineTo(x + bracketSize, y);
+          } else { // Bottom-right
+            ctx.moveTo(x - bracketSize, y);
+            ctx.lineTo(x, y);
+            ctx.lineTo(x, y - bracketSize);
+          }
+          ctx.stroke();
+        });
+        
+        // Add some retro "static" effect
+        if (Math.random() < 0.1) {
+          ctx.fillStyle = `rgba(255, 255, 255, ${Math.random() * 0.3})`;
+          for (let i = 0; i < 50; i++) {
+            const x = Math.random() * width;
+            const y = Math.random() * height;
+            ctx.fillRect(x, y, 1, 1);
+          }
+        }
       }
     },
     [move, isKeyDown, gameState, surface, gameOverStartTime]
@@ -238,6 +270,7 @@ const useCanvas = (options = {}) => {
     setMove(dir);
     setSurface(100);
     setIsKeyDown("");
+    setGameOverStartTime(0); // Reset game over timer
     ballRef.current = {
       x: Math.floor(Math.random() * width),
       y: Math.floor(Math.random() * height),
