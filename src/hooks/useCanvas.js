@@ -81,7 +81,6 @@ const useCanvas = (options = {}) => {
         if (ball.x + ball.dx > width - ballRadius / 2 - move.r) {
           ball.dx = -ball.dx;
           if (isKeyDown === "l") {
-            console.log('Ball hit moving wall, starting explosion');
             setGameState('explosion');
             setExplosionStartTime(Date.now());
             return;
@@ -270,11 +269,9 @@ const useCanvas = (options = {}) => {
       } else if (gameState === 'explosion') {
         const now = Date.now();
         const elapsed = explosionStartTime > 0 ? now - explosionStartTime : 0;
-        console.log('Explosion state active, elapsed:', elapsed, 'startTime:', explosionStartTime);
         const explosionDuration = 2500; // Much longer duration
         
         if (elapsed >= explosionDuration && explosionStartTime > 0) {
-          console.log('Explosion finished, transitioning to game over');
           setGameState('gameOverAnimation');
           setGameOverStartTime(Date.now());
         }
@@ -510,12 +507,10 @@ const useCanvas = (options = {}) => {
         }
       }
     },
-    [move, isKeyDown, gameState, surface, gameOverStartTime, explosionStartTime]
+    [move, isKeyDown, gameState, surface, gameOverStartTime, explosionStartTime, startScreenStartTime]
   );
 
   const startGame = useCallback(() => {
-    console.log('startGame called!');
-    
     // Reset ball position
     ballRef.current = {
       x: Math.floor(Math.random() * width),
@@ -532,8 +527,6 @@ const useCanvas = (options = {}) => {
     setExplosionStartTime(0);
     setStartScreenStartTime(Date.now()); // Reset this for next time we go to start screen
     setGameState('playing');
-    
-    console.log('State set to playing');
     
     // Focus the canvas
     if (canvasRef.current) {
@@ -585,7 +578,6 @@ const useCanvas = (options = {}) => {
   }, [surfacePercentage]);
 
   useEffect(() => {
-    console.log('Main useEffect triggered, gameState:', gameState);
     const canvas = canvasRef.current;
     const context = canvas.getContext(options.context || "2d");
 
@@ -597,7 +589,6 @@ const useCanvas = (options = {}) => {
     };
 
     if (gameState === 'playing' || gameState === 'gameOverAnimation' || gameState === 'explosion' || gameState === 'start') {
-      console.log('Starting animation for gameState:', gameState);
       render();
     }
 
@@ -609,13 +600,10 @@ const useCanvas = (options = {}) => {
   }, [draw, options, gameState]);
 
   useEffect(() => {
-    console.log('Second useEffect triggered, gameState:', gameState);
     if (gameState !== 'playing' && gameState !== 'gameOverAnimation' && gameState !== 'explosion' && gameState !== 'start' && animationRef.current) {
-      console.log('Canceling animation for gameState:', gameState);
       window.cancelAnimationFrame(animationRef.current);
       animationRef.current = null;
     } else if ((gameState === 'playing' || gameState === 'gameOverAnimation' || gameState === 'explosion' || gameState === 'start') && !animationRef.current) {
-      console.log('Starting new animation for gameState:', gameState);
       const canvas = canvasRef.current;
       const context = canvas.getContext(options.context || "2d");
       const render = () => {

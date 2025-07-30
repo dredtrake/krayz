@@ -8,7 +8,6 @@ const Canvas = (props) => {
     options
   );
   
-  console.log('Canvas render - gameState:', gameState, 'surface:', surface);
   
   
   return (
