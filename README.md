@@ -41,29 +41,34 @@ This project recreates the nostalgic experience of playing classic boundary-fill
 
 ## Development
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app) and uses [Bun](https://bun.sh/) as the JavaScript runtime and package manager.
+
+### Prerequisites
+
+- [Bun](https://bun.sh/) - Install with: `curl -fsSL https://bun.sh/install | bash`
 
 ### Available Scripts
 
 ```bash
 # Install dependencies
-npm install
+bun install
 
 # Start development server
-npm start
+bun run start
 
 # Build for production
-npm run build
+bun run build
 
 # Run tests
-npm test
+bun run test
 
 # Deploy to GitHub Pages
-npm run deploy
+bun run deploy
 ```
 
 ### Tech Stack
 
+- [Bun](https://bun.sh/) - Fast JavaScript runtime & package manager
 - React (with Hooks)
 - HTML5 Canvas API
 - Tailwind CSS
