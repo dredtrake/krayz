@@ -92,7 +92,7 @@ const useCanvas = (options = {}) => {
           setGameOverStartTime(Date.now());
         }
 
-        drawExplosion(ctx, width, height, ballRef.current, elapsed, explosionDuration);
+        drawExplosion(ctx, width, height, ballRef.current, elapsed, explosionDuration, move);
       } else if (gameState === 'gameOverAnimation' || gameState === 'gameOver') {
         const now = Date.now();
         const elapsed = gameOverStartTime > 0 ? now - gameOverStartTime : 0;
