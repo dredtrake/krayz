@@ -21,6 +21,7 @@ const useCanvas = (options = {}) => {
   const [surface, setSurface] = useState(0);
   const [gameOverStartTime, setGameOverStartTime] = useState(0);
   const [explosionStartTime, setExplosionStartTime] = useState(0);
+  const [startScreenStartTime, setStartScreenStartTime] = useState(Date.now());
   const canvasRef = useRef(null);
   const ballRef = useRef({
     x: Math.floor(Math.random() * width),
@@ -133,14 +134,14 @@ const useCanvas = (options = {}) => {
           ctx.fillRect(0, y, width, 1);
         }
         
-        // Independent wall animations
+        // Independent wall animations with different mathematical functions
         const maxWallSize = 40;
         
-        // Each wall moves independently with different speeds and phases
-        const leftWallSize = ((Math.sin(now * 0.0006) + 1) / 2) * maxWallSize;
-        const rightWallSize = ((Math.sin(now * 0.0008 + Math.PI * 0.3) + 1) / 2) * maxWallSize;
-        const topWallSize = ((Math.sin(now * 0.0007 + Math.PI * 0.6) + 1) / 2) * maxWallSize;
-        const bottomWallSize = ((Math.sin(now * 0.0009 + Math.PI) + 1) / 2) * maxWallSize;
+        // Each wall uses completely different movement patterns for true independence
+        const leftWallSize = ((Math.sin(now * 0.0014) + 1) / 2) * maxWallSize;
+        const rightWallSize = ((Math.cos(now * 0.0017) + 1) / 2) * maxWallSize;
+        const topWallSize = ((Math.sin(now * 0.0011 + Math.PI * 0.7) * Math.cos(now * 0.0003) + 1) / 2) * maxWallSize;
+        const bottomWallSize = ((Math.abs(Math.sin(now * 0.0019)) * 2 - 1 + 1) / 2) * maxWallSize;
         
         // Demo walls (translucent) with independent movement
         ctx.fillStyle = `rgba(255, 100, 150, 0.3)`; // left wall
@@ -196,24 +197,26 @@ const useCanvas = (options = {}) => {
         
         ctx.restore();
         
-        // Subtitle with typewriter effect (original style but slower)
+        // Subtitle with typewriter effect (original but without cycling)
         const subtitle1 = "Use arrow keys to shrink the walls";
         const subtitle2 = "Don't let the ball hit a moving wall!";
-        const typeSpeed = now * 0.02; // Slower typewriter effect
+        
+        const elapsed = now - startScreenStartTime;
+        const typeSpeed = elapsed * 0.02; // Slower typewriter effect
         
         ctx.fillStyle = `rgba(100, 255, 200, 0.9)`;
         ctx.font = "24px monospace";
         ctx.textAlign = "center";
         
-        // First subtitle
-        const chars1 = Math.min(subtitle1.length, Math.floor(typeSpeed % (subtitle1.length + 40)));
+        // First subtitle - original logic but without the modulo (cycling)
+        const chars1 = Math.min(subtitle1.length, Math.floor(typeSpeed));
         if (chars1 > 0) {
           ctx.fillText(subtitle1.substring(0, chars1), width / 2, height / 2 + 20);
         }
         
-        // Second subtitle (starts after first is complete)
+        // Second subtitle (starts after first is complete) - original logic but without modulo
         if (chars1 >= subtitle1.length) {
-          const chars2 = Math.min(subtitle2.length, Math.floor((typeSpeed - subtitle1.length - 20) % (subtitle2.length + 40)));
+          const chars2 = Math.min(subtitle2.length, Math.floor(typeSpeed - subtitle1.length - 20));
           if (chars2 > 0) {
             ctx.fillText(subtitle2.substring(0, chars2), width / 2, height / 2 + 55);
           }
