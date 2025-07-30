@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef } from 'react';
 
 const useTimer = ({ duration, callback }) => {
   const [isActive, setIsActive] = useState(false);

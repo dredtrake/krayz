@@ -1,2 +1,2 @@
-export { countSurface } from "./countSurface";
-export { resizeCanvas } from "./resizeCanvas";
+export { countSurface } from './countSurface';
+export { resizeCanvas } from './resizeCanvas';
