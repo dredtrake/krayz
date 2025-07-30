@@ -1,11 +1,11 @@
 // Scoring system for the game
 
-export const calculateScore = (surfacePercentage, elapsedTime) => {
+export const calculateScore = (surfacePercentage, elapsedTime, includeTimeBonus = true) => {
   // Base score from surface coverage (0-10000 points)
   const surfaceScore = surfacePercentage * 100;
 
-  // Time bonus (10 points per second survived)
-  const timeBonus = elapsedTime * 10;
+  // Time bonus (10 points per second survived) - only for final score
+  const timeBonus = includeTimeBonus ? elapsedTime * 10 : 0;
 
   // Efficiency bonus - rewards high coverage in less time
   // Maximum bonus of 5000 points for 100% coverage in minimal time

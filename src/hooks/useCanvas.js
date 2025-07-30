@@ -5,7 +5,7 @@ import { drawWalls, drawBall, updateBallPhysics } from '../renderers/gameRendere
 import { drawStartScreen } from '../renderers/startScreenRenderer';
 import { drawExplosion } from '../renderers/explosionRenderer';
 import { drawGameOverScreen } from '../renderers/gameOverRenderer';
-import { drawTimer, drawCoveredPercentage, drawCurrentScore } from '../renderers/timerRenderer';
+import { drawGameStats } from '../renderers/gameStatsRenderer';
 
 const [width, height] = [600, 600];
 
@@ -32,6 +32,8 @@ const useCanvas = (options = {}) => {
   const [timeLeft, setTimeLeft] = useState(100);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [gameScore, setGameScore] = useState(null);
+  const [displayedScore, setDisplayedScore] = useState(0);
+  const [targetScore, setTargetScore] = useState(0);
   const canvasRef = useRef(null);
   const ballRef = useRef({
     x: Math.floor(Math.random() * width),
@@ -40,6 +42,8 @@ const useCanvas = (options = {}) => {
     dy: -2,
   });
   const animationRef = useRef(null);
+  const gameStartTimeRef = useRef(0);
+  const surfaceRef = useRef(0);
 
   const surfacePercentage = useMemo(() => {
     const remainingArea = countSurface(width, height, move);
@@ -73,10 +77,8 @@ const useCanvas = (options = {}) => {
           setGameScore
         );
 
-        // Draw timer, covered percentage, and current score overlay
-        drawTimer(ctx, width, height, timeLeft);
-        drawCoveredPercentage(ctx, width, height, surface);
-        drawCurrentScore(ctx, width, height, surface, elapsedTime);
+        // Draw unified game stats overlay
+        drawGameStats(ctx, width, height, surface, timeLeft, displayedScore);
       }
 
       // Game state overlays
@@ -120,6 +122,7 @@ const useCanvas = (options = {}) => {
       timeLeft,
       elapsedTime,
       gameScore,
+      displayedScore,
     ]
   );
 
@@ -140,9 +143,13 @@ const useCanvas = (options = {}) => {
     setExplosionStartTime(0);
     setStartScreenStartTime(Date.now()); // Reset this for next time we go to start screen
     setTimeLeft(100); // Reset countdown timer
-    setGameStartTime(Date.now()); // Record when game started
+    const startTime = Date.now();
+    setGameStartTime(startTime); // Record when game started
+    gameStartTimeRef.current = startTime; // Also store in ref
     setElapsedTime(0); // Reset elapsed time
     setGameScore(null); // Reset score
+    setDisplayedScore(0); // Reset displayed score
+    setTargetScore(0); // Reset target score
     setGameState('playing');
 
     // Focus the canvas
@@ -187,6 +194,7 @@ const useCanvas = (options = {}) => {
 
   useEffect(() => {
     setSurface(surfacePercentage);
+    surfaceRef.current = surfacePercentage;
   }, [surfacePercentage]);
 
   // Countdown timer effect
@@ -197,11 +205,11 @@ const useCanvas = (options = {}) => {
       interval = setInterval(() => {
         setTimeLeft(prevTime => {
           const newTime = prevTime - 1;
-          const elapsed = Math.floor((Date.now() - gameStartTime) / 1000);
+          const elapsed = Math.floor((Date.now() - gameStartTimeRef.current) / 1000);
           setElapsedTime(elapsed);
           if (newTime <= 0) {
             // Calculate final score when time runs out
-            const finalScore = calculateScore(surface, elapsed);
+            const finalScore = calculateScore(surfaceRef.current, elapsed);
             setGameScore(finalScore);
             setGameState('gameOverAnimation');
             setGameOverStartTime(Date.now());
@@ -218,6 +226,50 @@ const useCanvas = (options = {}) => {
       }
     };
   }, [gameState, timeLeft]);
+
+  // Calculate target score continuously during gameplay (without time bonus)
+  useEffect(() => {
+    if (gameState === 'playing') {
+      const currentScore = calculateScore(surface, elapsedTime, false);
+      setTargetScore(currentScore.totalScore);
+    }
+  }, [surface, elapsedTime, gameState]);
+
+  // Animate displayed score towards target score
+  useEffect(() => {
+    let animationFrame;
+
+    const animateScore = () => {
+      setDisplayedScore(prevScore => {
+        const diff = targetScore - prevScore;
+
+        // If difference is small, just set it directly
+        if (Math.abs(diff) < 1) {
+          return targetScore;
+        }
+
+        // Otherwise, move towards target with easing
+        const speed = Math.max(1, Math.abs(diff) * 0.1);
+        if (diff > 0) {
+          return Math.min(targetScore, prevScore + speed);
+        } else {
+          return Math.max(targetScore, prevScore - speed);
+        }
+      });
+
+      animationFrame = requestAnimationFrame(animateScore);
+    };
+
+    if (gameState === 'playing') {
+      animateScore();
+    }
+
+    return () => {
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+      }
+    };
+  }, [targetScore, gameState]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
