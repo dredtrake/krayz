@@ -23,7 +23,7 @@ const Canvas = (props) => {
       
       {gameState === 'playing' && (
         <>
-          <p className="surface">Surface: {surface}%</p>
+          <p className="surface">Covered: {surface}%</p>
           <div className="pause" onClick={pauseGame}>
             Pause
           </div>
@@ -32,7 +32,7 @@ const Canvas = (props) => {
       
       {gameState === 'paused' && (
         <>
-          <p className="surface">Surface: {surface}% (PAUSED)</p>
+          <p className="surface">Covered: {surface}% (PAUSED)</p>
           <div className="pause" onClick={pauseGame}>
             Resume
           </div>

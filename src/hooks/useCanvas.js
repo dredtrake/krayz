@@ -18,7 +18,7 @@ const useCanvas = (options = {}) => {
   const [move, setMove] = useState(dir);
   const [isKeyDown, setIsKeyDown] = useState("");
   // value is in %
-  const [surface, setSurface] = useState(100);
+  const [surface, setSurface] = useState(0);
   const [gameOverStartTime, setGameOverStartTime] = useState(0);
   const canvasRef = useRef(null);
   const ballRef = useRef({
@@ -30,7 +30,9 @@ const useCanvas = (options = {}) => {
   const animationRef = useRef(null);
 
   const surfacePercentage = useMemo(() => {
-    return Math.floor((countSurface(width, height, move) * 100) / initialSurface);
+    const remainingArea = countSurface(width, height, move);
+    const coveredArea = initialSurface - remainingArea;
+    return Math.floor((coveredArea * 100) / initialSurface);
   }, [move]);
 
   const draw = useCallback(
@@ -190,7 +192,7 @@ const useCanvas = (options = {}) => {
         // Retro score display with typewriter effect
         if (elapsed > 1000) {
           const scoreProgress = Math.min(1, (elapsed - 1000) / 1000);
-          const scoreText = `FINAL SCORE: ${surface}%`;
+          const scoreText = `FINAL SCORE: ${surface}% COVERED`;
           const visibleChars = Math.floor(scoreText.length * scoreProgress);
           const displayText = scoreText.substring(0, visibleChars);
           
@@ -268,7 +270,7 @@ const useCanvas = (options = {}) => {
   const startGame = useCallback(() => {
     setGameState('playing');
     setMove(dir);
-    setSurface(100);
+    setSurface(0);
     setIsKeyDown("");
     setGameOverStartTime(0); // Reset game over timer
     ballRef.current = {
