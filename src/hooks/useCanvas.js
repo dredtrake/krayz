@@ -21,7 +21,7 @@ const useCanvas = (options = {}) => {
   const [surface, setSurface] = useState(0);
   const [gameOverStartTime, setGameOverStartTime] = useState(0);
   const [explosionStartTime, setExplosionStartTime] = useState(0);
-  const [startScreenStartTime, setStartScreenStartTime] = useState(Date.now());
+  const [startScreenStartTime] = useState(Date.now());
   const canvasRef = useRef(null);
   const ballRef = useRef({
     x: Math.floor(Math.random() * width),
@@ -392,7 +392,6 @@ const useCanvas = (options = {}) => {
         ctx.scale(textScale, textScale);
         
         // Create pixel-perfect text effect
-        const pixelSize = 8;
         const textFlicker = Math.sin(now * 0.02) > 0.1 ? 1 : 0.7; // Random flicker
         
         // Shadow/depth effect in retro green
@@ -487,7 +486,7 @@ const useCanvas = (options = {}) => {
         }
       }
     },
-    [move, isKeyDown, gameState, surface, gameOverStartTime, explosionStartTime]
+    [move, isKeyDown, gameState, surface, gameOverStartTime, explosionStartTime, startScreenStartTime]
   );
 
   const startGame = useCallback(() => {
