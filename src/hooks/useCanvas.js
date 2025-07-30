@@ -123,6 +123,7 @@ const useCanvas = (options = {}) => {
       elapsedTime,
       gameScore,
       displayedScore,
+      gameStartTime,
     ]
   );
 
