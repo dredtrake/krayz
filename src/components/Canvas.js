@@ -1,6 +1,6 @@
-import React from "react";
-import useCanvas from "../hooks/useCanvas";
-import GameUI from "./GameUI";
+import React from 'react';
+import useCanvas from '../hooks/useCanvas';
+import GameUI from './GameUI';
 
 const Canvas = (props) => {
   const { draw, options, ...rest } = props;
@@ -17,7 +17,7 @@ const Canvas = (props) => {
         onKeyDown={onKeyDown}
         onKeyUp={onKeyUp}
         ref={canvasRef}
-        tabIndex="0"
+        tabIndex='0'
         {...rest}
       />
       

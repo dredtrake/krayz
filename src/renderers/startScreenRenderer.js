@@ -4,7 +4,7 @@ export const drawStartScreen = (ctx, width, height, startScreenStartTime) => {
   const now = Date.now();
   
   // Gentle retro background with soft blue tint
-  ctx.fillStyle = "#001122";
+  ctx.fillStyle = '#001122';
   ctx.fillRect(0, 0, width, height);
   
   // Subtle animated background pattern (slower)
@@ -81,34 +81,34 @@ const drawTitle = (ctx, width, height, now) => {
   ctx.translate(width / 2, height / 2 - 100);
   
   // Title shadow
-  ctx.fillStyle = "rgba(0, 100, 150, 0.8)";
-  ctx.font = "bold 80px monospace";
-  ctx.textAlign = "center";
-  ctx.fillText("KRAYZ", 4, 4);
+  ctx.fillStyle = 'rgba(0, 100, 150, 0.8)';
+  ctx.font = 'bold 80px monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('KRAYZ', 4, 4);
   
   // Main title with gentle color shift
   const titleHue = Math.sin(now * 0.0008) * 30 + 180; // Slower blue to cyan shift
   ctx.fillStyle = `hsl(${titleHue}, 80%, 70%)`;
-  ctx.fillText("KRAYZ", 0, 0);
+  ctx.fillText('KRAYZ', 0, 0);
   
   // Title outline
-  ctx.strokeStyle = `rgba(255, 255, 255, 0.6)`;
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
   ctx.lineWidth = 2;
-  ctx.strokeText("KRAYZ", 0, 0);
+  ctx.strokeText('KRAYZ', 0, 0);
   
   ctx.restore();
 };
 
 const drawSubtitles = (ctx, width, height, now, startScreenStartTime) => {
-  const subtitle1 = "Use arrow keys to shrink the walls";
-  const subtitle2 = "Don't let the ball hit a moving wall!";
+  const subtitle1 = 'Use arrow keys to shrink the walls';
+  const subtitle2 = 'Don\'t let the ball hit a moving wall!';
   
   const elapsed = now - startScreenStartTime;
   const typeSpeed = elapsed * 0.02; // Slower typewriter effect
   
-  ctx.fillStyle = `rgba(100, 255, 200, 0.9)`;
-  ctx.font = "24px monospace";
-  ctx.textAlign = "center";
+  ctx.fillStyle = 'rgba(100, 255, 200, 0.9)';
+  ctx.font = '24px monospace';
+  ctx.textAlign = 'center';
   
   // First subtitle - original logic but without the modulo (cycling)
   const chars1 = Math.min(subtitle1.length, Math.floor(typeSpeed));

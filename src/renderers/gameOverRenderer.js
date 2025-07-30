@@ -23,7 +23,7 @@ export const drawGameOverScreen = (ctx, width, height, gameState, elapsed, surfa
 
 const drawBackground = (ctx, width, height, now, progress) => {
   // Retro CRT-style background with scanlines
-  ctx.fillStyle = "#000";
+  ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, width, height);
   
   // Add retro green tint overlay
@@ -49,7 +49,7 @@ const drawBackground = (ctx, width, height, now, progress) => {
 };
 
 const drawGameOverText = (ctx, width, height, gameState, elapsed, now) => {
-  // Retro pixel-style "GAME OVER" text
+  // Retro pixel-style 'GAME OVER' text
   const textScale = gameState === 'gameOverAnimation' ? 
     Math.min(1, (elapsed / 800) * 1.2) : 1; // Faster, bouncier scale
   
@@ -62,18 +62,18 @@ const drawGameOverText = (ctx, width, height, gameState, elapsed, now) => {
   
   // Shadow/depth effect in retro green
   ctx.fillStyle = `rgba(0, 150, 0, ${textFlicker * 0.8})`;
-  ctx.font = "bold 72px monospace";
-  ctx.textAlign = "center";
-  ctx.fillText("GAME OVER", 4, 4);
+  ctx.font = 'bold 72px monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('GAME OVER', 4, 4);
   
   // Main text in bright retro green
   ctx.fillStyle = `rgba(0, 255, 0, ${textFlicker})`;
-  ctx.fillText("GAME OVER", 0, 0);
+  ctx.fillText('GAME OVER', 0, 0);
   
   // Add retro outline effect
   ctx.strokeStyle = `rgba(255, 255, 255, ${textFlicker * 0.6})`;
   ctx.lineWidth = 2;
-  ctx.strokeText("GAME OVER", 0, 0);
+  ctx.strokeText('GAME OVER', 0, 0);
   
   ctx.restore();
 };
@@ -87,13 +87,13 @@ const drawScore = (ctx, width, height, elapsed, surface, now) => {
     const displayText = scoreText.substring(0, visibleChars);
     
     ctx.fillStyle = `rgba(255, 255, 0, ${scoreProgress})`;
-    ctx.font = "bold 28px monospace";
-    ctx.textAlign = "center";
+    ctx.font = 'bold 28px monospace';
+    ctx.textAlign = 'center';
     ctx.fillText(displayText, width / 2, height / 2 + 30);
     
     // Blinking cursor
     if (visibleChars < scoreText.length && Math.sin(now * 0.02) > 0) {
-      ctx.fillText("_", width / 2 + ctx.measureText(displayText).width / 2 + 10, height / 2 + 30);
+      ctx.fillText('_', width / 2 + ctx.measureText(displayText).width / 2 + 10, height / 2 + 30);
     }
   }
 };

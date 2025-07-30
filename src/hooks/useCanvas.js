@@ -1,9 +1,9 @@
-import { useCallback, useRef, useEffect, useState, useMemo } from "react";
-import { resizeCanvas, countSurface } from "../utils/";
-import { drawWalls, drawBall, updateBallPhysics } from "../renderers/gameRenderers";
-import { drawStartScreen } from "../renderers/startScreenRenderer";
-import { drawExplosion } from "../renderers/explosionRenderer";
-import { drawGameOverScreen } from "../renderers/gameOverRenderer";
+import { useCallback, useRef, useEffect, useState, useMemo } from 'react';
+import { resizeCanvas, countSurface } from '../utils/';
+import { drawWalls, drawBall, updateBallPhysics } from '../renderers/gameRenderers';
+import { drawStartScreen } from '../renderers/startScreenRenderer';
+import { drawExplosion } from '../renderers/explosionRenderer';
+import { drawGameOverScreen } from '../renderers/gameOverRenderer';
 
 const [width, height] = [600, 600];
 
@@ -98,7 +98,7 @@ const useCanvas = (options = {}) => {
     // Reset all state including startScreenStartTime
     setMove({ u: 0, d: 0, l: 0, r: 0 });
     setSurface(0);
-    setIsKeyDown("");
+    setIsKeyDown('');
     setGameOverStartTime(0);
     setExplosionStartTime(0);
     setStartScreenStartTime(Date.now()); // Reset this for next time we go to start screen
@@ -120,18 +120,18 @@ const useCanvas = (options = {}) => {
       if (gameState !== 'playing') {
         return false;
       }
-      if (key === "ArrowUp") {
+      if (key === 'ArrowUp') {
         setMove((prevState) => ({ ...prevState, d: prevState.d + 1 }));
-        setIsKeyDown("u");
-      } else if (key === "ArrowDown") {
+        setIsKeyDown('u');
+      } else if (key === 'ArrowDown') {
         setMove((prevState) => ({ ...prevState, u: prevState.u + 1 }));
-        setIsKeyDown("d");
-      } else if (key === "ArrowLeft") {
+        setIsKeyDown('d');
+      } else if (key === 'ArrowLeft') {
         setMove((prevState) => ({ ...prevState, r: prevState.r + 1 }));
-        setIsKeyDown("l");
-      } else if (key === "ArrowRight") {
+        setIsKeyDown('l');
+      } else if (key === 'ArrowRight') {
         setMove((prevState) => ({ ...prevState, l: prevState.l + 1 }));
-        setIsKeyDown("r");
+        setIsKeyDown('r');
       }
     },
     [gameState]
@@ -140,12 +140,12 @@ const useCanvas = (options = {}) => {
   const onKeyUp = useCallback((evt) => {
     const { key } = evt;
     if (
-      key === "ArrowUp" ||
-      key === "ArrowDown" ||
-      key === "ArrowLeft" ||
-      key === "ArrowRight"
+      key === 'ArrowUp' ||
+      key === 'ArrowDown' ||
+      key === 'ArrowLeft' ||
+      key === 'ArrowRight'
     ) {
-      setIsKeyDown("");
+      setIsKeyDown('');
     }
   }, []);
 
@@ -155,7 +155,7 @@ const useCanvas = (options = {}) => {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const context = canvas.getContext(options.context || "2d");
+    const context = canvas.getContext(options.context || '2d');
 
     resizeCanvas(canvas);
 
@@ -181,7 +181,7 @@ const useCanvas = (options = {}) => {
       animationRef.current = null;
     } else if ((gameState === 'playing' || gameState === 'gameOverAnimation' || gameState === 'explosion' || gameState === 'start') && !animationRef.current) {
       const canvas = canvasRef.current;
-      const context = canvas.getContext(options.context || "2d");
+      const context = canvas.getContext(options.context || '2d');
       const render = () => {
         draw(context);
         animationRef.current = window.requestAnimationFrame(render);

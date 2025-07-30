@@ -6,8 +6,8 @@ const GameUI = ({ gameState, surface, pauseGame, startGame }) => {
       {/* Game Info */}
       {gameState === 'playing' && (
         <>
-          <p className="surface">Covered: {surface}%</p>
-          <div className="pause" onClick={pauseGame}>
+          <p className='surface'>Covered: {surface}%</p>
+          <div className='pause' onClick={pauseGame}>
             Pause
           </div>
         </>
@@ -15,8 +15,8 @@ const GameUI = ({ gameState, surface, pauseGame, startGame }) => {
       
       {gameState === 'paused' && (
         <>
-          <p className="surface">Covered: {surface}% (PAUSED)</p>
-          <div className="pause" onClick={pauseGame}>
+          <p className='surface'>Covered: {surface}% (PAUSED)</p>
+          <div className='pause' onClick={pauseGame}>
             Resume
           </div>
         </>
@@ -24,7 +24,7 @@ const GameUI = ({ gameState, surface, pauseGame, startGame }) => {
       
       {/* Start/Restart Button */}
       {(gameState === 'start' || gameState === 'gameOver') && (
-        <div className="game-button" onClick={startGame} style={{
+        <div className='game-button' onClick={startGame} style={{
           position: 'absolute',
           bottom: '50px',
           left: '50%',
