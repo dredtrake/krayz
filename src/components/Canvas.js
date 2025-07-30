@@ -8,8 +8,8 @@ const Canvas = (props) => {
     options
   );
   
-  // Debug log to track state changes
-  console.log('Canvas render - gameState:', gameState);
+  console.log('Canvas render - gameState:', gameState, 'surface:', surface);
+  
   
   return (
     <>

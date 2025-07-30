@@ -21,7 +21,7 @@ const useCanvas = (options = {}) => {
   const [surface, setSurface] = useState(0);
   const [gameOverStartTime, setGameOverStartTime] = useState(0);
   const [explosionStartTime, setExplosionStartTime] = useState(0);
-  const [startScreenStartTime] = useState(Date.now());
+  const [startScreenStartTime, setStartScreenStartTime] = useState(Date.now());
   const canvasRef = useRef(null);
   const ballRef = useRef({
     x: Math.floor(Math.random() * width),
@@ -282,50 +282,74 @@ const useCanvas = (options = {}) => {
         const progress = Math.min(elapsed / explosionDuration, 1);
         const ball = ballRef.current;
         
-        // Enhanced explosion particles
-        const particleCount = 25;
+        // Chaotic explosion particles
+        const particleCount = 40;
         for (let i = 0; i < particleCount; i++) {
-          const angle = (i / particleCount) * Math.PI * 2 + (elapsed * 0.01);
-          const baseDistance = progress * (80 + i * 3);
-          const wobble = Math.sin(elapsed * 0.02 + i) * 15;
+          // Much more random angles and movement
+          const randomSeed = i * 7.123; // Use particle index as seed for consistent randomness
+          const chaosX = Math.sin(randomSeed * 2.5) * Math.cos(randomSeed * 1.7);
+          const chaosY = Math.cos(randomSeed * 3.1) * Math.sin(randomSeed * 2.2);
+          
+          // Random angle with chaos
+          const baseAngle = (i / particleCount) * Math.PI * 2;
+          const angleVariation = (Math.sin(randomSeed * 4.7) * Math.cos(elapsed * 0.05 + randomSeed)) * 2;
+          const angle = baseAngle + angleVariation;
+          
+          // Highly variable speeds and distances
+          const speedMultiplier = 0.5 + Math.abs(Math.sin(randomSeed * 3.3)) * 1.5;
+          const baseDistance = progress * (60 + Math.abs(chaosX) * 80) * speedMultiplier;
+          
+          // Erratic wobbling
+          const wobbleIntensity = 20 + Math.abs(chaosY) * 30;
+          const wobble = Math.sin(elapsed * (0.03 + Math.abs(chaosX) * 0.02) + randomSeed) * wobbleIntensity;
           const distance = baseDistance + wobble;
           
-          const x = ball.x + Math.cos(angle) * distance;
-          const y = ball.y + Math.sin(angle) * distance;
+          // Add some particles that spiral
+          const spiralEffect = Math.sin(elapsed * 0.08 + randomSeed * 2) * (progress * 40);
           
-          // More dynamic alpha and size
-          const alpha = (1 - progress) * (0.7 + Math.sin(elapsed * 0.03 + i) * 0.3);
-          const baseSize = 2 + i * 0.3;
-          const pulsing = Math.sin(elapsed * 0.04 + i * 0.5) * 2;
-          const size = Math.max(0.5, baseSize + pulsing * (1 - progress));
+          const x = ball.x + Math.cos(angle) * distance + chaosX * spiralEffect;
+          const y = ball.y + Math.sin(angle) * distance + chaosY * spiralEffect;
           
-          // Color gradient from bright orange to red
-          const colorProgress = Math.min(progress + i * 0.02, 1);
-          const red = 255;
-          const green = Math.floor(150 * (1 - colorProgress) + 50);
-          const blue = Math.floor(30 * (1 - colorProgress));
+          // Highly variable alpha and size
+          const alphaVariation = 0.4 + Math.abs(Math.sin(randomSeed * 5.1)) * 0.6;
+          const alpha = (1 - progress) * alphaVariation * (0.6 + Math.sin(elapsed * 0.04 + randomSeed) * 0.4);
+          
+          const baseSizeVariation = 1 + Math.abs(chaosY) * 4;
+          const pulsing = Math.sin(elapsed * (0.06 + Math.abs(chaosX) * 0.04) + randomSeed * 1.5) * 3;
+          const size = Math.max(0.3, baseSizeVariation + pulsing * (1 - progress));
+          
+          // More chaotic colors
+          const colorChaos = Math.sin(randomSeed * 6.7) * 0.5 + 0.5;
+          const red = Math.floor(255 * (0.8 + colorChaos * 0.2));
+          const green = Math.floor((120 + colorChaos * 80) * (1 - progress) + 30);
+          const blue = Math.floor((20 + colorChaos * 40) * (1 - progress));
           
           ctx.fillStyle = `rgba(${red}, ${green}, ${blue}, ${alpha})`;
           ctx.beginPath();
           ctx.arc(x, y, size, 0, Math.PI * 2);
           ctx.fill();
           
-          // Add particle trails
-          if (progress > 0.3) {
-            const trailX = ball.x + Math.cos(angle) * distance * 0.7;
-            const trailY = ball.y + Math.sin(angle) * distance * 0.7;
-            ctx.fillStyle = `rgba(${red}, ${green + 50}, ${blue + 20}, ${alpha * 0.4})`;
+          // More chaotic trails
+          if (progress > 0.2 && Math.sin(randomSeed * 3.8) > -0.3) {
+            const trailDistance = distance * (0.5 + Math.abs(chaosX) * 0.4);
+            const trailX = ball.x + Math.cos(angle) * trailDistance + chaosY * spiralEffect * 0.5;
+            const trailY = ball.y + Math.sin(angle) * trailDistance + chaosX * spiralEffect * 0.5;
+            ctx.fillStyle = `rgba(${red}, ${Math.min(255, green + 60)}, ${blue + 30}, ${alpha * 0.3})`;
             ctx.beginPath();
-            ctx.arc(trailX, trailY, size * 0.6, 0, Math.PI * 2);
+            ctx.arc(trailX, trailY, size * 0.4, 0, Math.PI * 2);
             ctx.fill();
           }
           
-          // Add sparks for some particles
-          if (i % 3 === 0 && progress < 0.8) {
-            const sparkX = x + (Math.random() - 0.5) * 10;
-            const sparkY = y + (Math.random() - 0.5) * 10;
-            ctx.fillStyle = `rgba(255, 255, 200, ${alpha * 0.8})`;
-            ctx.fillRect(sparkX, sparkY, 2, 2);
+          // More random sparks
+          if (Math.sin(randomSeed * 4.2) > 0.2 && progress < 0.9) {
+            const sparkCount = Math.floor(Math.abs(chaosY) * 3) + 1;
+            for (let s = 0; s < sparkCount; s++) {
+              const sparkX = x + (Math.sin(randomSeed * 7.5 + s) * 15);
+              const sparkY = y + (Math.cos(randomSeed * 8.1 + s) * 15);
+              const sparkSize = 1 + Math.abs(chaosX) * 2;
+              ctx.fillStyle = `rgba(255, ${200 + Math.floor(Math.abs(chaosY) * 55)}, 100, ${alpha * 0.9})`;
+              ctx.fillRect(sparkX - sparkSize/2, sparkY - sparkSize/2, sparkSize, sparkSize);
+            }
           }
         }
         
@@ -349,10 +373,10 @@ const useCanvas = (options = {}) => {
         
       } else if (gameState === 'gameOverAnimation' || gameState === 'gameOver') {
         const now = Date.now();
-        const elapsed = now - gameOverStartTime;
+        const elapsed = gameOverStartTime > 0 ? now - gameOverStartTime : 0;
         const animationDuration = 3000; // 3 seconds
         
-        if (gameState === 'gameOverAnimation' && elapsed >= animationDuration) {
+        if (gameState === 'gameOverAnimation' && elapsed >= animationDuration && gameOverStartTime > 0) {
           setGameState('gameOver');
         }
         
@@ -486,28 +510,35 @@ const useCanvas = (options = {}) => {
         }
       }
     },
-    [move, isKeyDown, gameState, surface, gameOverStartTime, explosionStartTime, startScreenStartTime]
+    [move, isKeyDown, gameState, surface, gameOverStartTime, explosionStartTime]
   );
 
   const startGame = useCallback(() => {
-    setGameState('playing');
-    setMove(dir);
-    setSurface(0);
-    setIsKeyDown("");
-    setGameOverStartTime(0);
-    setExplosionStartTime(0);
+    console.log('startGame called!');
+    
+    // Reset ball position
     ballRef.current = {
       x: Math.floor(Math.random() * width),
       y: Math.floor(Math.random() * height),
       dx: 2,
       dy: -2
     };
-    // Focus the canvas for immediate keyboard control
-    setTimeout(() => {
-      if (canvasRef.current) {
-        canvasRef.current.focus();
-      }
-    }, 100);
+    
+    // Reset all state including startScreenStartTime
+    setMove({ u: 0, d: 0, l: 0, r: 0 });
+    setSurface(0);
+    setIsKeyDown("");
+    setGameOverStartTime(0);
+    setExplosionStartTime(0);
+    setStartScreenStartTime(Date.now()); // Reset this for next time we go to start screen
+    setGameState('playing');
+    
+    console.log('State set to playing');
+    
+    // Focus the canvas
+    if (canvasRef.current) {
+      canvasRef.current.focus();
+    }
   }, []);
 
   const pauseGame = useCallback(() => {
@@ -554,6 +585,7 @@ const useCanvas = (options = {}) => {
   }, [surfacePercentage]);
 
   useEffect(() => {
+    console.log('Main useEffect triggered, gameState:', gameState);
     const canvas = canvasRef.current;
     const context = canvas.getContext(options.context || "2d");
 
@@ -565,6 +597,7 @@ const useCanvas = (options = {}) => {
     };
 
     if (gameState === 'playing' || gameState === 'gameOverAnimation' || gameState === 'explosion' || gameState === 'start') {
+      console.log('Starting animation for gameState:', gameState);
       render();
     }
 
@@ -576,10 +609,13 @@ const useCanvas = (options = {}) => {
   }, [draw, options, gameState]);
 
   useEffect(() => {
+    console.log('Second useEffect triggered, gameState:', gameState);
     if (gameState !== 'playing' && gameState !== 'gameOverAnimation' && gameState !== 'explosion' && gameState !== 'start' && animationRef.current) {
+      console.log('Canceling animation for gameState:', gameState);
       window.cancelAnimationFrame(animationRef.current);
       animationRef.current = null;
     } else if ((gameState === 'playing' || gameState === 'gameOverAnimation' || gameState === 'explosion' || gameState === 'start') && !animationRef.current) {
+      console.log('Starting new animation for gameState:', gameState);
       const canvas = canvasRef.current;
       const context = canvas.getContext(options.context || "2d");
       const render = () => {
