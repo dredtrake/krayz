@@ -1,4 +1,7 @@
 // Game rendering functions
+
+import { calculateScore } from '../utils/scoring';
+
 const ballRadius = 10;
 
 export const drawWalls = (ctx, width, height, move) => {
@@ -47,12 +50,20 @@ export const updateBallPhysics = (
   move,
   isKeyDown,
   setGameState,
-  setExplosionStartTime
+  setExplosionStartTime,
+  gameStartTime,
+  setElapsedTime,
+  surface,
+  setGameScore
 ) => {
   // Ball collision detection and movement
   if (ball.x + ball.dx > width - ballRadius / 2 - move.r) {
     ball.dx = -ball.dx;
     if (isKeyDown === 'l') {
+      const elapsed = Math.floor((Date.now() - gameStartTime) / 1000);
+      setElapsedTime(elapsed);
+      const finalScore = calculateScore(surface, elapsed);
+      setGameScore(finalScore);
       setGameState('explosion');
       setExplosionStartTime(Date.now());
       return;
@@ -61,6 +72,10 @@ export const updateBallPhysics = (
   if (ball.x + ball.dx < ballRadius / 2 + move.l) {
     ball.dx = -ball.dx;
     if (isKeyDown === 'r') {
+      const elapsed = Math.floor((Date.now() - gameStartTime) / 1000);
+      setElapsedTime(elapsed);
+      const finalScore = calculateScore(surface, elapsed);
+      setGameScore(finalScore);
       setGameState('explosion');
       setExplosionStartTime(Date.now());
       return;
@@ -69,6 +84,10 @@ export const updateBallPhysics = (
   if (ball.y + ball.dy < ballRadius / 2 + move.u) {
     ball.dy = -ball.dy;
     if (isKeyDown === 'd') {
+      const elapsed = Math.floor((Date.now() - gameStartTime) / 1000);
+      setElapsedTime(elapsed);
+      const finalScore = calculateScore(surface, elapsed);
+      setGameScore(finalScore);
       setGameState('explosion');
       setExplosionStartTime(Date.now());
       return;
@@ -77,6 +96,10 @@ export const updateBallPhysics = (
   if (ball.y + ball.dy > height - ballRadius / 2 - move.d) {
     ball.dy = -ball.dy;
     if (isKeyDown === 'u') {
+      const elapsed = Math.floor((Date.now() - gameStartTime) / 1000);
+      setElapsedTime(elapsed);
+      const finalScore = calculateScore(surface, elapsed);
+      setGameScore(finalScore);
       setGameState('explosion');
       setExplosionStartTime(Date.now());
       return;

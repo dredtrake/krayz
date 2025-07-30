@@ -1,9 +1,11 @@
 import { useCallback, useRef, useEffect, useState, useMemo } from 'react';
 import { resizeCanvas, countSurface } from '../utils/';
+import { calculateScore } from '../utils/scoring';
 import { drawWalls, drawBall, updateBallPhysics } from '../renderers/gameRenderers';
 import { drawStartScreen } from '../renderers/startScreenRenderer';
 import { drawExplosion } from '../renderers/explosionRenderer';
 import { drawGameOverScreen } from '../renderers/gameOverRenderer';
+import { drawTimer, drawCoveredPercentage, drawCurrentScore } from '../renderers/timerRenderer';
 
 const [width, height] = [600, 600];
 
@@ -26,6 +28,10 @@ const useCanvas = (options = {}) => {
   const [gameOverStartTime, setGameOverStartTime] = useState(0);
   const [explosionStartTime, setExplosionStartTime] = useState(0);
   const [startScreenStartTime, setStartScreenStartTime] = useState(Date.now());
+  const [gameStartTime, setGameStartTime] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(100);
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const [gameScore, setGameScore] = useState(null);
   const canvasRef = useRef(null);
   const ballRef = useRef({
     x: Math.floor(Math.random() * width),
@@ -60,8 +66,17 @@ const useCanvas = (options = {}) => {
           move,
           isKeyDown,
           setGameState,
-          setExplosionStartTime
+          setExplosionStartTime,
+          gameStartTime,
+          setElapsedTime,
+          surface,
+          setGameScore
         );
+
+        // Draw timer, covered percentage, and current score overlay
+        drawTimer(ctx, width, height, timeLeft);
+        drawCoveredPercentage(ctx, width, height, surface);
+        drawCurrentScore(ctx, width, height, surface, elapsedTime);
       }
 
       // Game state overlays
@@ -81,7 +96,7 @@ const useCanvas = (options = {}) => {
       } else if (gameState === 'gameOverAnimation' || gameState === 'gameOver') {
         const now = Date.now();
         const elapsed = gameOverStartTime > 0 ? now - gameOverStartTime : 0;
-        const animationDuration = 3000; // 3 seconds
+        const animationDuration = 10000; // 10 seconds to allow plenty of time to read score and timer
 
         if (
           gameState === 'gameOverAnimation' &&
@@ -91,7 +106,7 @@ const useCanvas = (options = {}) => {
           setGameState('gameOver');
         }
 
-        drawGameOverScreen(ctx, width, height, gameState, elapsed, surface);
+        drawGameOverScreen(ctx, width, height, gameState, elapsed, surface, elapsedTime, gameScore);
       }
     },
     [
@@ -102,6 +117,9 @@ const useCanvas = (options = {}) => {
       gameOverStartTime,
       explosionStartTime,
       startScreenStartTime,
+      timeLeft,
+      elapsedTime,
+      gameScore,
     ]
   );
 
@@ -121,6 +139,10 @@ const useCanvas = (options = {}) => {
     setGameOverStartTime(0);
     setExplosionStartTime(0);
     setStartScreenStartTime(Date.now()); // Reset this for next time we go to start screen
+    setTimeLeft(100); // Reset countdown timer
+    setGameStartTime(Date.now()); // Record when game started
+    setElapsedTime(0); // Reset elapsed time
+    setGameScore(null); // Reset score
     setGameState('playing');
 
     // Focus the canvas
@@ -166,6 +188,36 @@ const useCanvas = (options = {}) => {
   useEffect(() => {
     setSurface(surfacePercentage);
   }, [surfacePercentage]);
+
+  // Countdown timer effect
+  useEffect(() => {
+    let interval;
+
+    if (gameState === 'playing' && timeLeft > 0) {
+      interval = setInterval(() => {
+        setTimeLeft(prevTime => {
+          const newTime = prevTime - 1;
+          const elapsed = Math.floor((Date.now() - gameStartTime) / 1000);
+          setElapsedTime(elapsed);
+          if (newTime <= 0) {
+            // Calculate final score when time runs out
+            const finalScore = calculateScore(surface, elapsed);
+            setGameScore(finalScore);
+            setGameState('gameOverAnimation');
+            setGameOverStartTime(Date.now());
+            return 0;
+          }
+          return newTime;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [gameState, timeLeft]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
