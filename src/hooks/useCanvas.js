@@ -68,9 +68,19 @@ const useCanvas = (options = {}) => {
       
       // Draw ball (hide during explosion)
       if (gameState !== 'explosion') {
+        // Ball glow effect (similar to landing page)
+        const gradient = ctx.createRadialGradient(ball.x, ball.y, 0, ball.x, ball.y, ballRadius * 2);
+        gradient.addColorStop(0, isKeyDown !== "" ? 'rgba(159, 34, 16, 0.8)' : 'rgba(207, 186, 52, 0.8)');
+        gradient.addColorStop(1, isKeyDown !== "" ? 'rgba(159, 34, 16, 0)' : 'rgba(207, 186, 52, 0)');
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ballRadius * 2, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Main ball
         ctx.beginPath();
         ctx.arc(ball.x, ball.y, ballRadius, 0, Math.PI * 2);
-        ctx.fillStyle = isKeyDown !== "" ? "#9F221099" : "#CFBA3499";
+        ctx.fillStyle = isKeyDown !== "" ? "#9F2210" : "#CFBA34";
         ctx.fill();
         ctx.closePath();
       }
