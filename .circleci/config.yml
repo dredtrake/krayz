@@ -24,7 +24,7 @@ jobs:
       - checkout
       - run: ./build.sh
       - gh-pages/deploy:
-          ssh-fingerprints: "43:d9:27:15:91:af:82:04:b2:22:36:d3:4c:30:1c:14"
+          ssh-fingerprints: "SHA256:woF4iCDujgswl4hPuxBDZWuyB2l7hQSzteSoqYRcMNw"
 workflows:
   test:
     jobs:
