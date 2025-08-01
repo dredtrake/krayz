@@ -109,7 +109,7 @@ const useCanvas = (options = {}) => {
       } else if (gameState === 'gameOverAnimation' || gameState === 'gameOver') {
         const now = Date.now();
         const elapsed = gameOverStartTime > 0 ? now - gameOverStartTime : 0;
-        const animationDuration = 10000; // 10 seconds to allow plenty of time to read score and timer
+        const animationDuration = 4000; // 4 seconds - faster since score display is now quicker
 
         if (
           gameState === 'gameOverAnimation' &&

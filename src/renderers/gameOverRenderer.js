@@ -96,7 +96,7 @@ const drawScore = (ctx, width, height, elapsed, surface, elapsedTime, gameScore,
     const rank = getScoreRank(totalScore);
 
     // Surface coverage score (appears first)
-    const scoreProgress1 = Math.min(1, (elapsed - 1000) / 800);
+    const scoreProgress1 = Math.min(1, (elapsed - 300) / 400);
     if (scoreProgress1 > 0) {
       ctx.fillStyle = `rgba(100, 255, 150, ${scoreProgress1})`;
       ctx.font = `bold ${getResponsiveFontSize(24)}px monospace`;
@@ -109,8 +109,8 @@ const drawScore = (ctx, width, height, elapsed, surface, elapsedTime, gameScore,
     }
 
     // Time bonus (appears second)
-    if (elapsed > 2500) {
-      const scoreProgress2 = Math.min(1, (elapsed - 2500) / 1000);
+    if (elapsed > 800) {
+      const scoreProgress2 = Math.min(1, (elapsed - 800) / 400);
       ctx.fillStyle = `rgba(255, 150, 100, ${scoreProgress2})`;
       ctx.font = `bold ${getResponsiveFontSize(24)}px monospace`;
       ctx.fillText(
@@ -121,8 +121,8 @@ const drawScore = (ctx, width, height, elapsed, surface, elapsedTime, gameScore,
     }
 
     // Efficiency bonus (appears third)
-    if (elapsed > 4000) {
-      const scoreProgress3 = Math.min(1, (elapsed - 4000) / 1000);
+    if (elapsed > 1300) {
+      const scoreProgress3 = Math.min(1, (elapsed - 1300) / 400);
       ctx.fillStyle = `rgba(255, 100, 255, ${scoreProgress3})`;
       ctx.font = `bold ${getResponsiveFontSize(24)}px monospace`;
       ctx.fillText(
@@ -133,8 +133,8 @@ const drawScore = (ctx, width, height, elapsed, surface, elapsedTime, gameScore,
     }
 
     // Total score (appears fourth)
-    if (elapsed > 5500) {
-      const scoreProgress4 = Math.min(1, (elapsed - 5500) / 1000);
+    if (elapsed > 1800) {
+      const scoreProgress4 = Math.min(1, (elapsed - 1800) / 500);
       ctx.fillStyle = `rgba(255, 255, 100, ${scoreProgress4})`;
       ctx.font = `bold ${getResponsiveFontSize(32)}px monospace`;
       ctx.fillText(
@@ -145,15 +145,15 @@ const drawScore = (ctx, width, height, elapsed, surface, elapsedTime, gameScore,
     }
 
     // Rank display (appears last)
-    if (elapsed > 7000) {
-      const rankProgress = Math.min(1, (elapsed - 7000) / 1000);
+    if (elapsed > 2400) {
+      const rankProgress = Math.min(1, (elapsed - 2400) / 500);
       ctx.fillStyle = `rgba(${parseInt(rank.color.slice(1, 3), 16)}, ${parseInt(rank.color.slice(3, 5), 16)}, ${parseInt(rank.color.slice(5, 7), 16)}, ${rankProgress})`;
       ctx.font = `bold ${getResponsiveFontSize(28)}px monospace`;
       ctx.fillText(`RANK: ${rank.rank}`, width / 2, height / 2 + getResponsiveVerticalSpacing(160));
     }
-  } else if (elapsed > 1000) {
+  } else if (elapsed > 300) {
     // Fallback display if no score calculated
-    const scoreProgress = Math.min(1, (elapsed - 1000) / 1000);
+    const scoreProgress = Math.min(1, (elapsed - 300) / 500);
     const scoreText = `COVERAGE: ${surface}%`;
 
     ctx.fillStyle = `rgba(255, 255, 0, ${scoreProgress})`;
@@ -161,8 +161,8 @@ const drawScore = (ctx, width, height, elapsed, surface, elapsedTime, gameScore,
     ctx.textAlign = 'center';
     ctx.fillText(scoreText, width / 2, height / 2 + getResponsiveVerticalSpacing(30));
 
-    if (elapsed > 2500) {
-      const timeProgress = Math.min(1, (elapsed - 2500) / 1000);
+    if (elapsed > 900) {
+      const timeProgress = Math.min(1, (elapsed - 900) / 500);
       ctx.fillStyle = `rgba(255, 150, 100, ${timeProgress})`;
       ctx.font = `bold ${getResponsiveFontSize(24)}px monospace`;
       ctx.fillText(
