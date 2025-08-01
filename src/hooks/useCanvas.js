@@ -176,7 +176,7 @@ const useCanvas = (options = {}) => {
     if (canvasRef.current) {
       canvasRef.current.focus();
     }
-  }, []);
+  }, [gameDimensions.width, gameDimensions.height]);
 
   const pauseGame = useCallback(() => {
     setGameState(gameState === 'paused' ? 'playing' : 'paused');
