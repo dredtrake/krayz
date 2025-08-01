@@ -9,12 +9,15 @@
 
 body {
   @apply bg-black flex items-center justify-center min-h-screen;
+  overflow: hidden;
 }
 
 canvas {
   @apply focus:outline-0;
   width: var(--width);
   height: var(--height);
+  max-width: 90vw;
+  max-height: 70vh;
 }
 
 p {
@@ -25,6 +28,40 @@ p {
   @apply relative border-2 border-solid border-green-800;
   width: calc(var(--width) + 4px);
   height: calc(var(--height) + 4px);
+  max-width: calc(90vw + 4px);
+  max-height: calc(70vh + 4px);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  body {
+    padding: 10px;
+  }
+
+  canvas {
+    width: 90vw;
+    height: 90vw;
+    max-width: 90vw;
+    max-height: 70vh;
+  }
+
+  .app {
+    width: calc(90vw + 4px);
+    height: calc(90vw + 4px);
+    max-width: calc(90vw + 4px);
+    max-height: calc(70vh + 4px);
+  }
+
+  .game-stats-box {
+    @apply top-2 right-2 text-sm;
+    min-width: 180px;
+    padding: 12px;
+  }
+
+  .pause {
+    @apply bottom-4 right-4 text-lg;
+    padding: 8px 16px;
+  }
 }
 
 .surface {
@@ -98,5 +135,56 @@ p {
   }
   50% {
     opacity: 0.6;
+  }
+}
+
+/* Mobile Controls */
+.mobile-controls {
+  @apply fixed bottom-4 left-1/2 transform -translate-x-1/2;
+  z-index: 1000;
+}
+
+.controls-container {
+  @apply flex flex-col items-center gap-2;
+}
+
+.controls-middle {
+  @apply flex gap-8;
+}
+
+.control-button {
+  @apply bg-black bg-opacity-80 border-2 border-green-400 rounded-lg;
+  @apply text-green-400 text-2xl font-bold;
+  @apply w-16 h-16 flex items-center justify-center;
+  @apply transition-all duration-200;
+  @apply select-none;
+  font-family: monospace;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.control-button:active,
+.control-button:hover {
+  @apply bg-green-400 text-black scale-95;
+  box-shadow: 0 2px 8px rgba(0, 255, 136, 0.4);
+}
+
+.control-button:focus {
+  outline: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-controls {
+    @apply bottom-8;
+  }
+
+  .control-button {
+    @apply w-14 h-14 text-xl;
+  }
+
+  .controls-middle {
+    @apply gap-6;
   }
 }

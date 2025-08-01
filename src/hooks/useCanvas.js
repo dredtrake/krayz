@@ -1,14 +1,10 @@
 import { useCallback, useRef, useEffect, useState, useMemo } from 'react';
-import { resizeCanvas, countSurface } from '../utils/';
+import { resizeCanvas, countSurface, getCanvasSize } from '../utils/';
 import { calculateScore } from '../utils/scoring';
 import { drawWalls, drawBall, updateBallPhysics } from '../renderers/gameRenderers';
 import { drawStartScreen } from '../renderers/startScreenRenderer';
 import { drawExplosion } from '../renderers/explosionRenderer';
 import { drawGameOverScreen } from '../renderers/gameOverRenderer';
-
-const [width, height] = [600, 600];
-
-const initialSurface = width * height;
 
 const dir = {
   u: 0,
@@ -19,6 +15,13 @@ const dir = {
 
 // const ballRadius = 10; // Moved to gameRenderers.js
 const useCanvas = (options = {}) => {
+  // Initialize game dimensions
+  const initialDimensions = getCanvasSize();
+  const [gameDimensions, setGameDimensions] = useState({
+    width: initialDimensions.width,
+    height: initialDimensions.height,
+  });
+
   const [gameState, setGameState] = useState('start'); // 'start', 'playing', 'paused', 'gameOver', 'gameOverAnimation', 'explosion'
   const [move, setMove] = useState(dir);
   const [isKeyDown, setIsKeyDown] = useState('');
@@ -33,10 +36,12 @@ const useCanvas = (options = {}) => {
   const [gameScore, setGameScore] = useState(null);
   const [displayedScore, setDisplayedScore] = useState(0);
   const [targetScore, setTargetScore] = useState(0);
+
+  const initialSurface = gameDimensions.width * gameDimensions.height;
   const canvasRef = useRef(null);
   const ballRef = useRef({
-    x: Math.floor(Math.random() * width),
-    y: Math.floor(Math.random() * height),
+    x: Math.floor(Math.random() * gameDimensions.width),
+    y: Math.floor(Math.random() * gameDimensions.height),
     dx: 2,
     dy: -2,
   });
@@ -45,27 +50,27 @@ const useCanvas = (options = {}) => {
   const surfaceRef = useRef(0);
 
   const surfacePercentage = useMemo(() => {
-    const remainingArea = countSurface(width, height, move);
+    const remainingArea = countSurface(gameDimensions.width, gameDimensions.height, move);
     const coveredArea = initialSurface - remainingArea;
     return Math.floor((coveredArea * 100) / initialSurface);
-  }, [move]);
+  }, [move, gameDimensions, initialSurface]);
 
   const draw = useCallback(
     ctx => {
       const ball = ballRef.current;
 
-      ctx.clearRect(0, 0, width, height);
+      ctx.clearRect(0, 0, gameDimensions.width, gameDimensions.height);
 
       // Draw game elements
-      drawWalls(ctx, width, height, move);
+      drawWalls(ctx, gameDimensions.width, gameDimensions.height, move);
       drawBall(ctx, ball, isKeyDown, gameState);
 
       // Only update ball if game is playing
       if (gameState === 'playing') {
         updateBallPhysics(
           ball,
-          width,
-          height,
+          gameDimensions.width,
+          gameDimensions.height,
           move,
           isKeyDown,
           setGameState,
@@ -81,7 +86,7 @@ const useCanvas = (options = {}) => {
 
       // Game state overlays
       if (gameState === 'start') {
-        drawStartScreen(ctx, width, height, startScreenStartTime);
+        drawStartScreen(ctx, gameDimensions.width, gameDimensions.height, startScreenStartTime);
       } else if (gameState === 'explosion') {
         const now = Date.now();
         const elapsed = explosionStartTime > 0 ? now - explosionStartTime : 0;
@@ -92,7 +97,15 @@ const useCanvas = (options = {}) => {
           setGameOverStartTime(Date.now());
         }
 
-        drawExplosion(ctx, width, height, ballRef.current, elapsed, explosionDuration, move);
+        drawExplosion(
+          ctx,
+          gameDimensions.width,
+          gameDimensions.height,
+          ballRef.current,
+          elapsed,
+          explosionDuration,
+          move
+        );
       } else if (gameState === 'gameOverAnimation' || gameState === 'gameOver') {
         const now = Date.now();
         const elapsed = gameOverStartTime > 0 ? now - gameOverStartTime : 0;
@@ -106,7 +119,16 @@ const useCanvas = (options = {}) => {
           setGameState('gameOver');
         }
 
-        drawGameOverScreen(ctx, width, height, gameState, elapsed, surface, elapsedTime, gameScore);
+        drawGameOverScreen(
+          ctx,
+          gameDimensions.width,
+          gameDimensions.height,
+          gameState,
+          elapsed,
+          surface,
+          elapsedTime,
+          gameScore
+        );
       }
     },
     [
@@ -120,14 +142,15 @@ const useCanvas = (options = {}) => {
       elapsedTime,
       gameScore,
       gameStartTime,
+      gameDimensions,
     ]
   );
 
   const startGame = useCallback(() => {
     // Reset ball position
     ballRef.current = {
-      x: Math.floor(Math.random() * width),
-      y: Math.floor(Math.random() * height),
+      x: Math.floor(Math.random() * gameDimensions.width),
+      y: Math.floor(Math.random() * gameDimensions.height),
       dx: 2,
       dy: -2,
     };
@@ -189,10 +212,48 @@ const useCanvas = (options = {}) => {
     }
   }, []);
 
+  const onDirectionPress = useCallback(
+    direction => {
+      if (gameState !== 'playing') {
+        return false;
+      }
+
+      if (direction === 'up') {
+        setMove(prevState => ({ ...prevState, d: prevState.d + 1 }));
+        setIsKeyDown('u');
+      } else if (direction === 'down') {
+        setMove(prevState => ({ ...prevState, u: prevState.u + 1 }));
+        setIsKeyDown('d');
+      } else if (direction === 'left') {
+        setMove(prevState => ({ ...prevState, r: prevState.r + 1 }));
+        setIsKeyDown('l');
+      } else if (direction === 'right') {
+        setMove(prevState => ({ ...prevState, l: prevState.l + 1 }));
+        setIsKeyDown('r');
+      }
+    },
+    [gameState]
+  );
+
+  const onDirectionRelease = useCallback(() => {
+    setIsKeyDown('');
+  }, []);
+
   useEffect(() => {
     setSurface(surfacePercentage);
     surfaceRef.current = surfacePercentage;
   }, [surfacePercentage]);
+
+  // Handle window resize for responsive sizing
+  useEffect(() => {
+    const handleResize = () => {
+      const newDimensions = getCanvasSize();
+      setGameDimensions({ width: newDimensions.width, height: newDimensions.height });
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Countdown timer effect
   useEffect(() => {
@@ -334,6 +395,8 @@ const useCanvas = (options = {}) => {
     surface,
     onKeyDown,
     onKeyUp,
+    onDirectionPress,
+    onDirectionRelease,
     gameState,
     startGame,
     pauseGame,
