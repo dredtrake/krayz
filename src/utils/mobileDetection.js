@@ -45,3 +45,21 @@ export const getCanvasSize = () => {
     isMobile: false,
   };
 };
+
+export const getResponsiveFontSize = desktopSize => {
+  const mobile = isMobile();
+  if (mobile) {
+    // Reduce font size by about 30-40% on mobile
+    return Math.floor(desktopSize * 0.65);
+  }
+  return desktopSize;
+};
+
+export const getResponsiveVerticalSpacing = desktopSpacing => {
+  const mobile = isMobile();
+  if (mobile) {
+    // Reduce vertical spacing by about 30% on mobile to fit more content
+    return Math.floor(desktopSpacing * 0.7);
+  }
+  return desktopSpacing;
+};

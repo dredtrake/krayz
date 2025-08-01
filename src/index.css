@@ -53,14 +53,33 @@ p {
   }
 
   .game-stats-box {
-    @apply top-2 right-2 text-sm;
-    min-width: 180px;
-    padding: 12px;
+    @apply top-2 right-2;
+    min-width: 140px;
+    padding: 8px 12px;
+    font-size: 11px;
+  }
+
+  .game-stats-title {
+    font-size: 11px;
+    margin-bottom: 8px;
+  }
+
+  .stat-label {
+    font-size: 10px;
+  }
+
+  .stat-value {
+    font-size: 12px;
+  }
+
+  .stat-value.score {
+    font-size: 14px;
   }
 
   .pause {
-    @apply bottom-4 right-4 text-lg;
-    padding: 8px 16px;
+    @apply bottom-4 right-4;
+    padding: 6px 12px;
+    font-size: 14px;
   }
 }
 

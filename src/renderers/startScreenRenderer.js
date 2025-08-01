@@ -1,4 +1,5 @@
 // Start screen rendering functions
+import { getResponsiveFontSize } from '../utils';
 
 export const drawStartScreen = (ctx, width, height, startScreenStartTime) => {
   const now = Date.now();
@@ -83,7 +84,7 @@ const drawTitle = (ctx, width, height, now) => {
 
   // Title shadow
   ctx.fillStyle = 'rgba(0, 100, 150, 0.8)';
-  ctx.font = 'bold 80px monospace';
+  ctx.font = `bold ${getResponsiveFontSize(80)}px monospace`;
   ctx.textAlign = 'center';
   ctx.fillText('KRAYZ', 4, 4);
 
@@ -108,7 +109,7 @@ const drawSubtitles = (ctx, width, height, now, startScreenStartTime) => {
   const typeSpeed = elapsed * 0.02; // Slower typewriter effect
 
   ctx.fillStyle = 'rgba(100, 255, 200, 0.9)';
-  ctx.font = '24px monospace';
+  ctx.font = `${getResponsiveFontSize(24)}px monospace`;
   ctx.textAlign = 'center';
 
   // First subtitle - original logic but without the modulo (cycling)

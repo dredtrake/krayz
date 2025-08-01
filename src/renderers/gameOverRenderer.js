@@ -1,6 +1,7 @@
 // Game over screen rendering functions
 
 import { getScoreRank } from '../utils/scoring';
+import { getResponsiveFontSize, getResponsiveVerticalSpacing, isMobile } from '../utils';
 
 export const drawGameOverScreen = (
   ctx,
@@ -64,7 +65,7 @@ const drawGameOverText = (ctx, width, height, gameState, elapsed, now) => {
   const textScale = gameState === 'gameOverAnimation' ? Math.min(1, (elapsed / 800) * 1.2) : 1; // Faster, bouncier scale
 
   ctx.save();
-  ctx.translate(width / 2, height / 2 - 60);
+  ctx.translate(width / 2, height / 2 - getResponsiveVerticalSpacing(60));
   ctx.scale(textScale, textScale);
 
   // Create pixel-perfect text effect
@@ -72,7 +73,7 @@ const drawGameOverText = (ctx, width, height, gameState, elapsed, now) => {
 
   // Shadow/depth effect in retro green
   ctx.fillStyle = `rgba(0, 150, 0, ${textFlicker * 0.8})`;
-  ctx.font = 'bold 72px monospace';
+  ctx.font = `bold ${getResponsiveFontSize(72)}px monospace`;
   ctx.textAlign = 'center';
   ctx.fillText('GAME OVER', 4, 4);
 
@@ -98,41 +99,57 @@ const drawScore = (ctx, width, height, elapsed, surface, elapsedTime, gameScore,
     const scoreProgress1 = Math.min(1, (elapsed - 1000) / 800);
     if (scoreProgress1 > 0) {
       ctx.fillStyle = `rgba(100, 255, 150, ${scoreProgress1})`;
-      ctx.font = 'bold 24px monospace';
+      ctx.font = `bold ${getResponsiveFontSize(24)}px monospace`;
       ctx.textAlign = 'center';
-      ctx.fillText(`Coverage: ${surface}% (${surfaceScore} pts)`, width / 2, height / 2 + 20);
+      ctx.fillText(
+        `Coverage: ${surface}% (${surfaceScore} pts)`,
+        width / 2,
+        height / 2 + getResponsiveVerticalSpacing(20)
+      );
     }
 
     // Time bonus (appears second)
     if (elapsed > 2500) {
       const scoreProgress2 = Math.min(1, (elapsed - 2500) / 1000);
       ctx.fillStyle = `rgba(255, 150, 100, ${scoreProgress2})`;
-      ctx.font = 'bold 24px monospace';
-      ctx.fillText(`Time: ${elapsedTime}s (${timeBonus} pts)`, width / 2, height / 2 + 50);
+      ctx.font = `bold ${getResponsiveFontSize(24)}px monospace`;
+      ctx.fillText(
+        `Time: ${elapsedTime}s (${timeBonus} pts)`,
+        width / 2,
+        height / 2 + getResponsiveVerticalSpacing(50)
+      );
     }
 
     // Efficiency bonus (appears third)
     if (elapsed > 4000) {
       const scoreProgress3 = Math.min(1, (elapsed - 4000) / 1000);
       ctx.fillStyle = `rgba(255, 100, 255, ${scoreProgress3})`;
-      ctx.font = 'bold 24px monospace';
-      ctx.fillText(`Efficiency Bonus: ${efficiencyBonus} pts`, width / 2, height / 2 + 80);
+      ctx.font = `bold ${getResponsiveFontSize(24)}px monospace`;
+      ctx.fillText(
+        `Efficiency Bonus: ${efficiencyBonus} pts`,
+        width / 2,
+        height / 2 + getResponsiveVerticalSpacing(80)
+      );
     }
 
     // Total score (appears fourth)
     if (elapsed > 5500) {
       const scoreProgress4 = Math.min(1, (elapsed - 5500) / 1000);
       ctx.fillStyle = `rgba(255, 255, 100, ${scoreProgress4})`;
-      ctx.font = 'bold 32px monospace';
-      ctx.fillText(`TOTAL: ${totalScore} pts`, width / 2, height / 2 + 120);
+      ctx.font = `bold ${getResponsiveFontSize(32)}px monospace`;
+      ctx.fillText(
+        `TOTAL: ${totalScore} pts`,
+        width / 2,
+        height / 2 + getResponsiveVerticalSpacing(120)
+      );
     }
 
     // Rank display (appears last)
     if (elapsed > 7000) {
       const rankProgress = Math.min(1, (elapsed - 7000) / 1000);
       ctx.fillStyle = `rgba(${parseInt(rank.color.slice(1, 3), 16)}, ${parseInt(rank.color.slice(3, 5), 16)}, ${parseInt(rank.color.slice(5, 7), 16)}, ${rankProgress})`;
-      ctx.font = 'bold 28px monospace';
-      ctx.fillText(`RANK: ${rank.rank}`, width / 2, height / 2 + 160);
+      ctx.font = `bold ${getResponsiveFontSize(28)}px monospace`;
+      ctx.fillText(`RANK: ${rank.rank}`, width / 2, height / 2 + getResponsiveVerticalSpacing(160));
     }
   } else if (elapsed > 1000) {
     // Fallback display if no score calculated
@@ -140,15 +157,19 @@ const drawScore = (ctx, width, height, elapsed, surface, elapsedTime, gameScore,
     const scoreText = `COVERAGE: ${surface}%`;
 
     ctx.fillStyle = `rgba(255, 255, 0, ${scoreProgress})`;
-    ctx.font = 'bold 28px monospace';
+    ctx.font = `bold ${getResponsiveFontSize(28)}px monospace`;
     ctx.textAlign = 'center';
-    ctx.fillText(scoreText, width / 2, height / 2 + 30);
+    ctx.fillText(scoreText, width / 2, height / 2 + getResponsiveVerticalSpacing(30));
 
     if (elapsed > 2500) {
       const timeProgress = Math.min(1, (elapsed - 2500) / 1000);
       ctx.fillStyle = `rgba(255, 150, 100, ${timeProgress})`;
-      ctx.font = 'bold 24px monospace';
-      ctx.fillText(`Time Played: ${elapsedTime}s`, width / 2, height / 2 + 70);
+      ctx.font = `bold ${getResponsiveFontSize(24)}px monospace`;
+      ctx.fillText(
+        `Time Played: ${elapsedTime}s`,
+        width / 2,
+        height / 2 + getResponsiveVerticalSpacing(70)
+      );
     }
   }
 };
