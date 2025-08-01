@@ -1,5 +1,5 @@
 import { useCallback, useRef, useEffect, useState, useMemo } from 'react';
-import { resizeCanvas, countSurface, getCanvasSize } from '../utils/';
+import { resizeCanvas, countSurface, getCanvasSize, isMobile } from '../utils/';
 import { calculateScore } from '../utils/scoring';
 import { drawWalls, drawBall, updateBallPhysics } from '../renderers/gameRenderers';
 import { drawStartScreen } from '../renderers/startScreenRenderer';
@@ -11,6 +11,11 @@ const dir = {
   d: 0,
   l: 0,
   r: 0,
+};
+
+const getBallSpeed = () => {
+  // Reduce ball speed on mobile for better playability
+  return isMobile() ? 1.3 : 2;
 };
 
 // const ballRadius = 10; // Moved to gameRenderers.js
@@ -39,11 +44,12 @@ const useCanvas = (options = {}) => {
 
   const initialSurface = gameDimensions.width * gameDimensions.height;
   const canvasRef = useRef(null);
+  const ballSpeed = getBallSpeed();
   const ballRef = useRef({
     x: Math.floor(Math.random() * gameDimensions.width),
     y: Math.floor(Math.random() * gameDimensions.height),
-    dx: 2,
-    dy: -2,
+    dx: ballSpeed,
+    dy: -ballSpeed,
   });
   const animationRef = useRef(null);
   const gameStartTimeRef = useRef(0);
@@ -148,11 +154,12 @@ const useCanvas = (options = {}) => {
 
   const startGame = useCallback(() => {
     // Reset ball position
+    const currentBallSpeed = getBallSpeed();
     ballRef.current = {
       x: Math.floor(Math.random() * gameDimensions.width),
       y: Math.floor(Math.random() * gameDimensions.height),
-      dx: 2,
-      dy: -2,
+      dx: currentBallSpeed,
+      dy: -currentBallSpeed,
     };
 
     // Reset all state including startScreenStartTime
