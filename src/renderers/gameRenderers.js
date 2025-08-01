@@ -1,6 +1,12 @@
 // Game rendering functions
 
 import { calculateScore } from '../utils/scoring';
+import { isMobile } from '../utils';
+
+const getBallSpeed = () => {
+  // Consistent ball speed - slower on mobile
+  return isMobile() ? 1.3 : 2;
+};
 
 const ballRadius = 10;
 
@@ -57,8 +63,10 @@ export const updateBallPhysics = (
   setGameScore
 ) => {
   // Ball collision detection and movement
+  const speed = getBallSpeed();
+
   if (ball.x + ball.dx > width - ballRadius / 2 - move.r) {
-    ball.dx = -ball.dx;
+    ball.dx = -Math.abs(speed); // Ensure consistent leftward speed
     if (isKeyDown === 'l') {
       const elapsed = Math.floor((Date.now() - gameStartTime) / 1000);
       setElapsedTime(elapsed);
@@ -70,7 +78,7 @@ export const updateBallPhysics = (
     }
   }
   if (ball.x + ball.dx < ballRadius / 2 + move.l) {
-    ball.dx = -ball.dx;
+    ball.dx = Math.abs(speed); // Ensure consistent rightward speed
     if (isKeyDown === 'r') {
       const elapsed = Math.floor((Date.now() - gameStartTime) / 1000);
       setElapsedTime(elapsed);
@@ -82,7 +90,7 @@ export const updateBallPhysics = (
     }
   }
   if (ball.y + ball.dy < ballRadius / 2 + move.u) {
-    ball.dy = -ball.dy;
+    ball.dy = Math.abs(speed); // Ensure consistent downward speed
     if (isKeyDown === 'd') {
       const elapsed = Math.floor((Date.now() - gameStartTime) / 1000);
       setElapsedTime(elapsed);
@@ -94,7 +102,7 @@ export const updateBallPhysics = (
     }
   }
   if (ball.y + ball.dy > height - ballRadius / 2 - move.d) {
-    ball.dy = -ball.dy;
+    ball.dy = -Math.abs(speed); // Ensure consistent upward speed
     if (isKeyDown === 'u') {
       const elapsed = Math.floor((Date.now() - gameStartTime) / 1000);
       setElapsedTime(elapsed);
