@@ -1,7 +1,7 @@
 // Game over screen rendering functions
 
 import { getScoreRank } from '../utils/scoring';
-import { getResponsiveFontSize, getResponsiveVerticalSpacing, isMobile } from '../utils';
+import { getResponsiveFontSize, getResponsiveVerticalSpacing } from '../utils';
 
 export const drawGameOverScreen = (
   ctx,
